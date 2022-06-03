@@ -42,10 +42,10 @@ async function handleRTCDataChannelMessage(webrtc, action) {
   const li = document.createElement('li');
 
   li.classList.add('text-success');
-  li.innerHTML = `[接收]&nbsp;
+  li.innerHTML = `[<time class="fw-bold text-12px">${ action.payload.date }</time>&nbsp;接收]&nbsp;
 <a class="link-success" href="#" data-id="${ webrtc.targetId }">
   ${ webrtc.targetId }
-</a>：${ action.payload }`;
+</a>：${ action.payload.text }`;
   allMessage.appendChild(li);
 }
 
@@ -143,15 +143,20 @@ function handleSendMessage(event) {
   const value = sendMessageTextarea.value;
 
   if (RTCTarget && value) {
+    const date = dayjs().format('YYYY-MM-DD HH:mm:ss');
+
     RTCTarget.sendMessage({
       type: 'text',
-      payload: value
+      payload: {
+        text: value,
+        date
+      }
     });
 
     const li = document.createElement('li');
 
     li.classList.add('text-primary');
-    li.innerHTML = `[发送]&nbsp;
+    li.innerHTML = `[<time class="fw-bold text-12px">${ date }</time>&nbsp;发送]&nbsp;
 <a class="link-primary" href="#" data-id="${ RTCTarget.targetId }">
   ${ RTCTarget.targetId }
 </a>：${ value }`;
