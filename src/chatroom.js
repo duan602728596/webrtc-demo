@@ -8,18 +8,19 @@ const sendMessageBtn = document.getElementById('send-message-btn');
 const myIdView = document.getElementById('my-id-view');
 const targetIdView = document.getElementById('target-id-view');
 const allMessage = document.getElementById('all-message');
+const bsOfflineHinAlert = document.getElementById('offline-hint-alert');
 
-// 当前用户的id
+/* 当前用户的id */
 const id = randomString();
 
 myIdView.innerText = id;
 document.title = `${ document.title } ( ${ id } )`;
 
-// 所有的RTC
+/* 所有的RTC */
 const RTCMap = new Map();
 let RTCTarget = null;
 
-// websocket连接
+/* websocket连接 */
 const isHttps = location.protocol === 'https:';
 const ws = new WebSocket(`ws${ isHttps ? 's' : '' }://${ location.host }/ws/rtc`);
 
@@ -27,7 +28,7 @@ ws.sendJson = function(data) {
   ws.send(JSON.stringify(data));
 };
 
-// 初始化
+/* 初始化 */
 function handleWebsocketOpen(event) {
   ws.sendJson({
     type: SOCKET_TYPE.INIT,
@@ -37,7 +38,7 @@ function handleWebsocketOpen(event) {
 
 ws.addEventListener('open', handleWebsocketOpen);
 
-// 通道监听消息
+/* 通道监听消息 */
 async function handleRTCDataChannelMessage(webrtc, action) {
   const li = document.createElement('li');
 
@@ -49,7 +50,7 @@ async function handleRTCDataChannelMessage(webrtc, action) {
   allMessage.appendChild(li);
 }
 
-// 监听所有消息
+/* 监听所有消息 */
 async function handleWebsocketMessage(event) {
   const action = JSON.parse(event.data);
 
@@ -70,6 +71,7 @@ async function handleWebsocketMessage(event) {
 
         if (RTCTarget?.targetId === action.payload.closeId) {
           targetIdView.innerText = '';
+          sendMessageBtn.disabled = true;
         }
       }
 
@@ -92,53 +94,65 @@ async function handleWebsocketMessage(event) {
 
 ws.addEventListener('message', handleWebsocketMessage);
 
-// 创建webRTC
-async function createWebRTC(acceptId) {
-  if (!RTCMap.has(acceptId)) {
-    const token = randomString(30);
-    const webrtc = new WebRTC({
-      id,
-      targetId: acceptId,
-      token,
-      ws,
-      onDataChannelMessage: handleRTCDataChannelMessage
-    });
-
-    await webrtc.init();
-    RTCMap.set(acceptId, webrtc);
-  }
-
-  RTCTarget = RTCMap.get(acceptId);
-  targetIdView.innerText = RTCTarget.targetId;
-}
-
-// 监听按钮点击事件
+/* 监听按钮点击事件 */
 async function handleConnectIdsBtnClick(event) {
   event.stopPropagation();
   event.preventDefault();
   const { target } = event;
 
   if (target.tagName.toLocaleLowerCase() === 'button') {
-    await createWebRTC(target.dataset.id);
+    const acceptId = target.dataset.id;
+
+    if (!RTCMap.has(acceptId)) {
+      const token = randomString(30);
+      const webrtc = new WebRTC({
+        id,
+        targetId: acceptId,
+        token,
+        ws,
+        onDataChannelMessage: handleRTCDataChannelMessage
+      });
+
+      await webrtc.init();
+      RTCMap.set(acceptId, webrtc);
+    }
+
+    RTCTarget = RTCMap.get(acceptId);
+    targetIdView.innerText = RTCTarget.targetId;
+    sendMessageBtn.disabled = false;
   }
 }
 
 connectIds.addEventListener('click', handleConnectIdsBtnClick);
 
-// 点击消息内的下划线监听
+/* 点击消息内的下划线监听 */
 async function handleAllMessageLinkClick(event) {
   event.stopPropagation();
   event.preventDefault();
   const { target } = event;
 
   if (target.tagName.toLocaleLowerCase() === 'a') {
-    await createWebRTC(target.dataset.id);
+    const acceptId = target.dataset.id;
+
+    if (RTCMap.has(id)) {
+      RTCTarget = RTCMap.get(acceptId);
+      targetIdView.innerText = RTCTarget.targetId;
+      sendMessageBtn.disabled = false;
+    } else if (!document.getElementById('offline-hint-alert-clone')) {
+      // 对方下线提示
+      const bsAlert = bsOfflineHinAlert.cloneNode(true);
+
+      bsAlert.classList.remove('d-none');
+      bsAlert.id = 'offline-hint-alert-clone';
+      document.body.appendChild(bsAlert);
+      new bootstrap.Alert(bsAlert);
+    }
   }
 }
 
 allMessage.addEventListener('click', handleAllMessageLinkClick);
 
-// 发送消息
+/* 发送消息 */
 function handleSendMessage(event) {
   const value = sendMessageTextarea.value;
 
