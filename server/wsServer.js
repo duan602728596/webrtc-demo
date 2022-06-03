@@ -20,13 +20,17 @@ function sendAllIds(closeId) {
     }
   });
 
-  wsConnectMap.forEach((connect) => connect.sendJson({
-    type: SOCKET_TYPE.ALL_IDS,
-    payload: {
-      ids,
-      closeId
-    }
-  }));
+  ids.forEach((id) => {
+    const connect = wsConnectMap.get(id);
+
+    connect && connect.sendJson({
+      type: SOCKET_TYPE.ALL_IDS,
+      payload: {
+        ids,
+        closeId
+      }
+    })
+  });
 }
 
 /* 初始化 */
