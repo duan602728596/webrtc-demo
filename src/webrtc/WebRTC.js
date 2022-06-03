@@ -7,8 +7,7 @@ class WebRTC {
       targetId,
       token,
       ws,
-      onDataChannelMessage,
-      onTrack
+      onDataChannelMessage
     } = config;
 
     this.id = id;             // 我的id
@@ -16,7 +15,6 @@ class WebRTC {
     this.token = token;       // 两端唯一的token
     this.ws = ws;             // websocket
     this.onDataChannelMessage = onDataChannelMessage; // 接收消息的回调函数
-    this.onTrack = onTrack;   // 监听track的回调
     this.rtc = new RTCPeerConnection(); // rtc，https://gist.github.com/yetithefoot/7592580
 
     // websocket
