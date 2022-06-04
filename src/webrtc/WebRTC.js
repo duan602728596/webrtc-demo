@@ -86,6 +86,7 @@ class WebRTC {
   }
 
   /**
+   * 请求端
    * @param { RTCSessionDescriptionInit } sdp: 接收端的answer
    */
   async answer(sdp) {

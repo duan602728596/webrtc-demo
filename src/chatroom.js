@@ -1,32 +1,24 @@
-import randomString from './utils/randomString.js';
-import SOCKET_TYPE from './webrtc/SocketType.js';
 import WebRTC from './webrtc/WebRTC.js';
+import SOCKET_TYPE from './webrtc/SocketType.js';
+import randomString from './utils/randomString.js';
+import getUserId from './utils/getUserId.js';
+import websocketInstance from './utils/websocketInstance.js';
+import bsAlert from './utils/bsAlert.js';
 
 const connectIds = document.getElementById('connect-ids');
-const sendMessageTextarea = document.getElementById('send-message-textarea');
 const sendMessageBtn = document.getElementById('send-message-btn');
-const myIdView = document.getElementById('my-id-view');
 const targetIdView = document.getElementById('target-id-view');
 const allMessage = document.getElementById('all-message');
-const bsOfflineHinAlert = document.getElementById('offline-hint-alert');
 
-/* 当前用户的id */
-const id = randomString();
+/* ========== 生成当前用户的id ========== */
+const id = getUserId('my-id-view');
 
-myIdView.innerText = id;
-document.title = `${ document.title } ( ${ id } )`;
+/* ========== RTC ========== */
+const RTCMap = new Map(); // 当前所有的webrtc连接
+let RTCTarget = null;     // 发送的webrtc
 
-/* 所有的RTC */
-const RTCMap = new Map();
-let RTCTarget = null;
-
-/* websocket连接 */
-const isHttps = location.protocol === 'https:';
-const ws = new WebSocket(`ws${ isHttps ? 's' : '' }://${ location.host }/ws/rtc`);
-
-ws.sendJson = function(data) {
-  ws.send(JSON.stringify(data));
-};
+/* ========== websocket连接 ========== */
+const ws = websocketInstance();
 
 /* 初始化 */
 function handleWebsocketOpen(event) {
@@ -77,6 +69,7 @@ async function handleWebsocketMessage(event) {
 
       break;
 
+    // 收到消息，创建连接
     case SOCKET_TYPE.RTC_ASK:
       const webrtc = new WebRTC({
         id,
@@ -94,14 +87,13 @@ async function handleWebsocketMessage(event) {
 
 ws.addEventListener('message', handleWebsocketMessage);
 
-/* 监听按钮点击事件 */
+/* ========== 根据当前在线的人，切换RTCTarget，监听按钮点击事件 ========== */
 async function handleConnectIdsBtnClick(event) {
   event.stopPropagation();
   event.preventDefault();
-  const { target } = event;
 
-  if (target.tagName.toLocaleLowerCase() === 'button') {
-    const acceptId = target.dataset.id;
+  if (event.target.tagName.toLocaleLowerCase() === 'button') {
+    const acceptId = event.target.dataset.id;
 
     if (!RTCMap.has(acceptId)) {
       const token = randomString(30);
@@ -125,34 +117,29 @@ async function handleConnectIdsBtnClick(event) {
 
 connectIds.addEventListener('click', handleConnectIdsBtnClick);
 
-/* 点击消息内的下划线监听 */
+/* ========== 点击消息内的下划线，切换RTCTarget ========== */
 async function handleAllMessageLinkClick(event) {
   event.stopPropagation();
   event.preventDefault();
-  const { target } = event;
 
-  if (target.tagName.toLocaleLowerCase() === 'a') {
-    const acceptId = target.dataset.id;
+  if (event.target.tagName.toLocaleLowerCase() === 'a') {
+    const acceptId = event.target.dataset.id;
 
-    if (RTCMap.has(id)) {
+    if (RTCMap.has(acceptId)) {
       RTCTarget = RTCMap.get(acceptId);
       targetIdView.innerText = RTCTarget.targetId;
       sendMessageBtn.disabled = false;
-    } else if (!document.getElementById('offline-hint-alert-clone')) {
-      // 对方下线提示
-      const bsAlert = bsOfflineHinAlert.cloneNode(true);
-
-      bsAlert.classList.remove('d-none');
-      bsAlert.id = 'offline-hint-alert-clone';
-      document.body.appendChild(bsAlert);
-      new bootstrap.Alert(bsAlert);
+    } else {
+      bsAlert(); // 对方下线提示
     }
   }
 }
 
 allMessage.addEventListener('click', handleAllMessageLinkClick);
 
-/* 发送消息 */
+/* ========== 发送聊天消息 ========== */
+const sendMessageTextarea = document.getElementById('send-message-textarea');
+
 function handleSendMessage(event) {
   const value = sendMessageTextarea.value;
 
