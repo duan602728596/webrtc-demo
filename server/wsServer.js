@@ -69,12 +69,15 @@ function handleWebSocketServerConnection(ws) {
 }
 
 /**
+ * http server
+ * @typedef { import('node:http').Server } HttpServer
+ * @typedef { import('node:https').Server } HttpsServer
+ * @typedef { import('node:http2').Http2SecureServer } Http2Server
+ */
+
+/**
  * 创建websocket server
- * @param {
- *   import('node:http').Server
- *   | import('node:https').Server
- *   | import('node:http2').Http2SecureServer
- * } server: 创建webSocket的Server
+ * @param { HttpServer | HttpsServer | Http2Server } server: 创建webSocket的Server
  */
 function wsServer(server) {
   const webSocketServer = new WebSocketServer({
