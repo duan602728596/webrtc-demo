@@ -25,7 +25,8 @@ class WebRTC {
     this.dataChannel.addEventListener('open', () => console.log('允许发送消息'));
 
     // 监听RTC的消息
-    this.rtc.addEventListener('connectionstatechange', this.handleRTCConnectionStatusChange);
+    this.rtc.addEventListener('connectionstatechange',
+      (event) => console.log(`connection state: ${ this.rtc.connectionState }`));
     this.rtc.addEventListener('datachannel', this.handleRTCDataChannel);
     this.rtc.addEventListener('icecandidate', this.handleRTCIcecandidate);
   }
@@ -38,11 +39,6 @@ class WebRTC {
       ...object
     };
   }
-
-  // RTC connection state change
-  handleRTCConnectionStatusChange = (event) => {
-    console.log(`connection state: ${ this.rtc.connectionState }`);
-  };
 
   // RTC datachannel
   handleRTCDataChannel = (event) => {
