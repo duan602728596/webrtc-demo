@@ -11,47 +11,40 @@ const queue = new Queue({ workerLen: 1 });
  * 发送所有的id
  * @param { string | undefined } closeId: 如果是被关闭，则发送closeId
  */
-function sendAllIds(closeId) {
+function socketBroadcastAllIds(closeId) {
   const ids = [];
 
-  wsConnectMap.forEach((connect, id) => {
-    if (connect.type === 'message') {
-      ids.push(id);
-    }
-  });
+  wsConnectMap.forEach((connect, id) => (connect.type === 'message' && ids.push(id)));
 
   ids.forEach((id) => {
     const connect = wsConnectMap.get(id);
 
     connect && connect.sendJson({
       type: SOCKET_TYPE.ALL_IDS,
-      payload: {
-        ids,
-        closeId
-      }
+      payload: { ids, closeId }
     })
   });
 }
 
-/* 初始化 */
-function wsInit(action, ws) {
-  const connect = new WsConnect(action.payload, ws, 'message');
-
-  ws._connectId = action.payload;
-  wsConnectMap.set(action.payload, connect);
-  queue.use([sendAllIds]);
-  queue.run();
-}
-
+/**
+ * websocket的连接事件
+ * @param { import('ws').WebSocket } ws: socket
+ */
 function handleWebSocketServerConnection(ws) {
   ws.on('message', function(data) {
     const action = JSON.parse(data);
 
-    // 初始化
+    // 初始化，并将消息广播
     if (action.type === SOCKET_TYPE.INIT) {
-      wsInit(action, ws);
+      const connect = new WsConnect(action.payload, ws, 'message');
+
+      ws._connectId = action.payload;
+      wsConnectMap.set(action.payload, connect);
+      queue.use([socketBroadcastAllIds]);
+      queue.run();
     }
 
+    // 将消息发送给指定的ws连接
     if ([SOCKET_TYPE.RTC_ASK, SOCKET_TYPE.RTC_CONFIRM, SOCKET_TYPE.RTC_CANDIDATE].includes(action.type)) {
       const item = wsConnectMap.get(action.payload.targetId);
 
@@ -63,12 +56,19 @@ function handleWebSocketServerConnection(ws) {
     const connect = wsConnectMap.get(ws._connectId);
 
     wsConnectMap.delete(connect.id, connect);
-    queue.use([sendAllIds, undefined, connect.id]);
+    queue.use([socketBroadcastAllIds, undefined, connect.id]);
     queue.run();
   });
 }
 
-/* 创建websocket server */
+/**
+ * 创建websocket server
+ * @param {
+ *   import('node:http').Server
+ *   | import('node:https').Server
+ *   | import('node:http2').Http2SecureServer
+ * } server: 创建webSocket的Server
+ */
 function wsServer(server) {
   const webSocketServer = new WebSocketServer({
     server,
