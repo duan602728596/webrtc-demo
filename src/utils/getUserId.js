@@ -8,7 +8,7 @@ function getUserId(element) {
   const id = randomString();
   const myIdView = document.getElementById(element);
 
-  myIdView.innerText = id;
+  myIdView && (myIdView.innerText = id);
   document.title = `${ document.title } ( ${ id } )`;
 
   return id;

@@ -51,7 +51,7 @@ async function handleWebsocketMessage(event) {
     case SOCKET_TYPE.ALL_IDS:
       connectIds.innerHTML = action.payload.ids
         .filter((o) => o !== id)
-        .map((o) => `<button class="me-2 btn btn-info" data-id="${ o }">${ o }</button>`)
+        .map((o) => `<button class="me-2 btn btn-info" type="button" data-id="${ o }">${ o }</button>`)
         .join('');
 
       // 移除连接
