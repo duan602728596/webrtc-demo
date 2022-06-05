@@ -7,7 +7,8 @@ class WebRTC {
       targetId,
       token,
       ws,
-      onDataChannelMessage
+      onDataChannelMessage,
+      onDisconnected
     } = config;
 
     this.id = id;             // 我的id
@@ -15,20 +16,20 @@ class WebRTC {
     this.token = token;       // 两端唯一的token
     this.ws = ws;             // websocket
     this.onDataChannelMessage = onDataChannelMessage; // 接收消息的回调函数
-    this.rtc = new RTCPeerConnection(); // rtc，https://gist.github.com/yetithefoot/7592580
+    this.onDisconnected = onDisconnected; // 信道关闭
+    this.rtc = new RTCPeerConnection();   // rtc，https://gist.github.com/yetithefoot/7592580
 
     // websocket
     this.ws.addEventListener('message', this.handleWebsocketMessage);
 
     // 创建消息通道
     this.dataChannel = this.rtc.createDataChannel(`sendChannel-${ this.id }`);
-    this.dataChannel.addEventListener('open', () => console.log('允许发送消息'));
+    this.dataChannel.addEventListener('open', (event) => console.log('允许发送消息'));
 
     // 监听RTC的消息
-    this.rtc.addEventListener('connectionstatechange',
-      (event) => console.log(`connection state: ${ this.rtc.connectionState }`));
-    this.rtc.addEventListener('datachannel', this.handleRTCDataChannel);
+    this.rtc.addEventListener('connectionstatechange', this.handleRTCConnectionstatechange);
     this.rtc.addEventListener('icecandidate', this.handleRTCIcecandidate);
+    this.rtc.addEventListener('datachannel', this.handleRTCDataChannel);
   }
 
   createPayload(object = {}) {
@@ -40,23 +41,33 @@ class WebRTC {
     };
   }
 
-  // RTC datachannel
-  handleRTCDataChannel = (event) => {
-    if (event.channel.label === `sendChannel-${ this.targetId }`) {
-      event.channel.addEventListener('open', () => console.log('允许接收消息'));
-      event.channel.addEventListener('message', this.handleDataChannelMessage);
+  // RTC状态的变化
+  handleRTCConnectionstatechange = (event) => {
+    console.log(`connection state: ${ this.rtc.connectionState }`)
+
+    if (this.rtc.connectionState === 'disconnected') {
+      this.onDisconnected?.(this, event);
     }
   };
 
   // 信道连接
   handleRTCIcecandidate = async (event) => {
     if (event.candidate) {
+      console.log('ICE层发送相关数据');
       this.ws.sendJson({
         type: SOCKET_TYPE.RTC_CANDIDATE,
         payload: this.createPayload({
           candidate: event.candidate
         })
       });
+    }
+  };
+
+  // RTC datachannel
+  handleRTCDataChannel = (event) => {
+    if (event.channel.label === `sendChannel-${ this.targetId }`) {
+      event.channel.addEventListener('open', () => console.log('允许接收消息'));
+      event.channel.addEventListener('message', this.handleDataChannelMessage);
     }
   };
 
@@ -101,6 +112,7 @@ class WebRTC {
         break;
 
       case SOCKET_TYPE.RTC_CANDIDATE:
+        console.log('ICE层接收并添加相关数据');
         await this.rtc.addIceCandidate(action.payload.candidate);
         break;
     }

@@ -9,7 +9,8 @@ class VideoRTC {
       ws,
       stream,
       onTrack,
-      onStreamInactive
+      onStreamInactive,
+      onDisconnected
     } = config;
 
     this.id = id;             // 我的id
@@ -17,9 +18,10 @@ class VideoRTC {
     this.token = token;       // 两端唯一的token
     this.ws = ws;             // websocket
     this.rtc = new RTCPeerConnection();
-    this.onTrack = onTrack;
     this.stream = stream;
+    this.onTrack = onTrack;
     this.onStreamInactive = onStreamInactive;
+    this.onDisconnected = onDisconnected;
 
     // websocket
     this.ws.addEventListener('message', this.handleWebsocketMessage);
@@ -28,17 +30,12 @@ class VideoRTC {
     if (this.stream) {
       this.stream.getTracks().forEach(track => this.rtc.addTrack(track, stream));
       this.stream.addEventListener('inactive', this.handleStreamInactive);
-
-      this.rtc.onremovetrack = () => {
-        console.log(12345);
-      };
     }
 
     // 监听RTC的消息
-    this.rtc.addEventListener('connectionstatechange',
-      (event) => console.log(`connection state: ${ this.rtc.connectionState }`));
-    this.rtc.addEventListener('track', this.handleRTCTrack);
+    this.rtc.addEventListener('connectionstatechange', this.handleRTCConnectionstatechange);
     this.rtc.addEventListener('icecandidate', this.handleRTCIcecandidate);
+    this.rtc.addEventListener('track', this.handleRTCTrack);
   }
 
   createPayload(object = {}) {
@@ -50,15 +47,19 @@ class VideoRTC {
     };
   }
 
-  // track事件
-  handleRTCTrack = (event) => {
-    this.stream = event.streams[0];
-    this.onTrack?.(this, event);
+  // RTC状态的变化
+  handleRTCConnectionstatechange = (event) => {
+    console.log(`connection state: ${ this.rtc.connectionState }`)
+
+    if (this.rtc.connectionState === 'disconnected') {
+      this.onDisconnected?.(this, event);
+    }
   };
 
   // 信道连接
   handleRTCIcecandidate = async (event) => {
     if (event.candidate) {
+      console.log('ICE层发送相关数据');
       this.ws.sendJson({
         type: SOCKET_TYPE.RTC_CANDIDATE,
         payload: this.createPayload({
@@ -66,6 +67,12 @@ class VideoRTC {
         })
       });
     }
+  };
+
+  // track事件
+  handleRTCTrack = (event) => {
+    this.stream = event.streams[0];
+    this.onTrack?.(this, event);
   };
 
   // 请求端
@@ -102,6 +109,7 @@ class VideoRTC {
         break;
 
       case SOCKET_TYPE.RTC_CANDIDATE:
+        console.log('ICE层接收并添加相关数据');
         await this.rtc.addIceCandidate(action.payload.candidate);
         break;
     }

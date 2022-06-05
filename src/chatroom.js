@@ -17,6 +17,19 @@ const id = getUserId('my-id-view');
 const RTCMap = new Map(); // 当前所有的webrtc连接
 let RTCTarget = null;     // 发送的webrtc
 
+/* ========== 移除RTC的连接 ========== */
+function handleRemoveRTCDisconnected(rtc, event) {
+  const webrtc = RTCMap.get(rtc.targetId);
+
+  webrtc.destroy();
+  RTCMap.delete(rtc.targetId);
+
+  if (RTCTarget?.targetId === rtc.targetId) {
+    targetIdView.innerText = '';
+    sendMessageBtn.disabled = true;
+  }
+}
+
 /* ========== websocket连接 ========== */
 const ws = websocketInstance();
 
@@ -54,19 +67,6 @@ async function handleWebsocketMessage(event) {
         .map((o) => `<button class="me-2 btn btn-info" type="button" data-id="${ o }">${ o }</button>`)
         .join('');
 
-      // 移除连接
-      if (action.payload.closeId && RTCMap.has(action.payload.closeId)) {
-        const webrtc = RTCMap.get(action.payload.closeId);
-
-        webrtc.destroy();
-        RTCMap.delete(action.payload.closeId);
-
-        if (RTCTarget?.targetId === action.payload.closeId) {
-          targetIdView.innerText = '';
-          sendMessageBtn.disabled = true;
-        }
-      }
-
       break;
 
     // 收到消息，创建连接
@@ -76,7 +76,8 @@ async function handleWebsocketMessage(event) {
         targetId: action.payload.id,
         token: action.payload.token,
         ws,
-        onDataChannelMessage: handleRTCDataChannelMessage
+        onDataChannelMessage: handleRTCDataChannelMessage,
+        onDisconnected: handleRemoveRTCDisconnected
       });
 
       await webrtc.confirm(action.payload.sdp);
@@ -102,7 +103,8 @@ async function handleConnectIdsBtnClick(event) {
         targetId: acceptId,
         token,
         ws,
-        onDataChannelMessage: handleRTCDataChannelMessage
+        onDataChannelMessage: handleRTCDataChannelMessage,
+        onDisconnected: handleRemoveRTCDisconnected
       });
 
       await webrtc.init();
