@@ -73,7 +73,7 @@ class WebRTC {
 
   // 通道接收消息
   handleDataChannelMessage = (event) => {
-    const action = JSON.parse(event.data);
+    const action = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
 
     this.onDataChannelMessage(this, action);
   };
@@ -146,9 +146,20 @@ class WebRTC {
     this.rtc.close();
   }
 
-  // 发送消息
+  /**
+   * 发送消息
+   * @param { object } data
+   */
   sendMessage(data) {
     this.dataChannel.send(JSON.stringify(data));
+  }
+
+  /**
+   * 发送ArrayBuffer
+   @param { ArrayBuffer } data
+   */
+  sendBuffer(data) {
+    this.dataChannel.send(data);
   }
 }
 

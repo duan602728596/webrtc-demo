@@ -1,5 +1,6 @@
 import WebRTC from './webrtc/WebRTC.js';
 import SOCKET_TYPE from './webrtc/SocketType.js';
+import ImageCache from './webrtc/ImageCache.js';
 import randomString from './utils/randomString.js';
 import getUserId from './utils/getUserId.js';
 import websocketInstance from './utils/websocketInstance.js';
@@ -7,6 +8,7 @@ import bsAlert from './utils/bsAlert.js';
 
 const connectIds = document.getElementById('connect-ids');
 const sendMessageBtn = document.getElementById('send-message-btn');
+const uploadFile = document.getElementById('upload-file');
 const targetIdView = document.getElementById('target-id-view');
 const allMessage = document.getElementById('all-message');
 
@@ -27,6 +29,7 @@ function handleRemoveRTCDisconnected(rtc, event) {
   if (RTCTarget?.targetId === rtc.targetId) {
     targetIdView.innerText = '';
     sendMessageBtn.disabled = true;
+    uploadFile.disabled = true;
   }
 }
 
@@ -44,15 +47,53 @@ function handleWebsocketOpen(event) {
 ws.addEventListener('open', handleWebsocketOpen);
 
 /* 通道监听消息 */
-async function handleRTCDataChannelMessage(webrtc, action) {
-  const li = document.createElement('li');
+const queue = new Q.Queue({ workerLen: 1 }); // 使用队列保证图片ArrayBuffer的顺序
 
-  li.classList.add('text-success');
-  li.innerHTML = `[<time class="fw-bold text-12px">${ action.payload.date }</time>&nbsp;接收]&nbsp;
-<a class="link-success" href="#" data-id="${ webrtc.targetId }">
-  ${ webrtc.targetId }
-</a>：${ action.payload.text }`;
-  allMessage.appendChild(li);
+async function handleRTCDataChannelMessage(webrtc, action) {
+  // 接收二进制消息
+  if (!(action.type && action.payload)) {
+    queue.use([webrtc.imgCache.arrayBuffer.push, webrtc.imgCache.arrayBuffer, action]);
+    queue.run();
+
+    const arrayBufferSize = webrtc.imgCache.arrayBufferSize;
+
+    // 图片接收完毕
+    if (arrayBufferSize >= webrtc.imgCache.size) {
+      queue.use([() => {
+        const arraybuffer = ImageCache.arrayBufferConcat(webrtc.imgCache.arrayBuffer);
+        const li = document.createElement('li');
+
+        li.classList.add('text-success');
+        li.innerHTML = `[<time class="fw-bold text-12px">${ webrtc.imgCache.date }</time>&nbsp;接收]&nbsp;
+<a class="link-success" href="#" data-id="${ webrtc.targetId }">${ webrtc.targetId }</a>
+：<img class="upload-image">`;
+        li.querySelector('img').src = URL.createObjectURL(
+          new Blob([arraybuffer], { type: webrtc.imgCache.type }));
+        allMessage.appendChild(li);
+        webrtc.imgCache = null;
+      }]);
+      queue.run();
+    }
+
+    return;
+  }
+
+  // 图片信息
+  if (action.type === 'image-info') {
+    queue.use([() => webrtc.imgCache = new ImageCache(action.payload)]);
+    queue.run();
+  }
+
+  // 文字消息
+  if (action.type === 'text') {
+    const li = document.createElement('li');
+
+    li.classList.add('text-success');
+    li.innerHTML = `[<time class="fw-bold text-12px">${ action.payload.date }</time>&nbsp;接收]&nbsp;
+<a class="link-success" href="#" data-id="${ webrtc.targetId }">${ webrtc.targetId }</a>
+：${ action.payload.text }`;
+    allMessage.appendChild(li);
+  }
 }
 
 /* 监听所有消息 */
@@ -114,6 +155,7 @@ async function handleConnectIdsBtnClick(event) {
     RTCTarget = RTCMap.get(acceptId);
     targetIdView.innerText = RTCTarget.targetId;
     sendMessageBtn.disabled = false;
+    uploadFile.disabled = false;
   }
 }
 
@@ -131,6 +173,7 @@ async function handleAllMessageLinkClick(event) {
       RTCTarget = RTCMap.get(acceptId);
       targetIdView.innerText = RTCTarget.targetId;
       sendMessageBtn.disabled = false;
+      uploadFile.disabled = false;
     } else {
       bsAlert(); // 对方下线提示
     }
@@ -160,12 +203,55 @@ function handleSendMessage(event) {
 
     li.classList.add('text-primary');
     li.innerHTML = `[<time class="fw-bold text-12px">${ date }</time>&nbsp;发送]&nbsp;
-<a class="link-primary" href="#" data-id="${ RTCTarget.targetId }">
-  ${ RTCTarget.targetId }
-</a>：${ value }`;
+<a class="link-primary" href="#" data-id="${ RTCTarget.targetId }">${ RTCTarget.targetId }</a>
+：${ value }`;
     allMessage.appendChild(li);
     sendMessageTextarea.value = '';
   }
 }
 
 sendMessageBtn.addEventListener('click', handleSendMessage);
+
+/* ========== 发送图片 ========== */
+function handleSendImageChange(event) {
+  if (RTCTarget && event.target.files?.length) {
+    const reader = new FileReader();
+
+    reader.addEventListener('load', () => {
+      const { name, size, type } = event.target.files[0];
+      const date = dayjs().format('YYYY-MM-DD HH:mm:ss');
+      const id = randomString(30);
+      const arraybuffer = reader.result;
+
+      // 本地插入图片
+      const li = document.createElement('li');
+
+      li.classList.add('text-primary');
+      li.innerHTML = `[<time class="fw-bold text-12px">${ date }</time>&nbsp;发送]&nbsp;
+<a class="link-primary" href="#" data-id="${ RTCTarget.targetId }">${ RTCTarget.targetId }</a>
+：<img class="upload-image">`;
+      li.querySelector('img').src = URL.createObjectURL(new Blob([arraybuffer], { type }));
+      allMessage.appendChild(li);
+
+      // 发送图片信息
+      RTCTarget.sendMessage({
+        type: 'image-info',
+        payload: { id, name, size, type, date }
+      });
+
+      // 分片发送
+      const partialSize = 1_024 * 5; // 每片大小
+      const partial = Math.ceil(size / partialSize); // 上传次数
+
+      for (let i = 0; i < partial; i++) {
+        const sliceArraybuffer = arraybuffer.slice(partialSize * i, i === partial - 1 ? size : partialSize * (i + 1));
+
+        RTCTarget.sendBuffer(sliceArraybuffer);
+      }
+    });
+
+    reader.readAsArrayBuffer(event.target.files[0]);
+  }
+}
+
+uploadFile.addEventListener('change', handleSendImageChange);

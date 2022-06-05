@@ -9,6 +9,7 @@
     crossorigin="anonymous">
   <style>
     .text-12px { font-size: 12px; }
+    .upload-image { max-width: 500px; max-height: 500px; }
   </style>
 </head>
 <body>
@@ -26,6 +27,12 @@
     <button class="me-4 btn btn-primary" id="send-message-btn" type="button" disabled>发送</button>
     ID：<span class="me-4" id="my-id-view"></span>
     TargetID：<span id="target-id-view"></span>
+
+    <!-- 发送图片 -->
+    <div class="mt-4">
+      <label class="form-label" for="upload-file">发送图片：</label>
+      <input class="form-control" id="upload-file" type="file" accept="image/*" disabled>
+    </div>
   </div>
 
   <!-- 接收消息 -->
@@ -56,6 +63,7 @@
 <script>
   dayjs.locale('zh-cn'); // dayjs locale config
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@bbkkbkk/q@1.1.1/dist/Q.min.js"></script>
 <script src="./chatroom.js" type="module"></script>
 </body>
 </html>
