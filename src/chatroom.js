@@ -63,7 +63,7 @@ async function handleRTCDataChannelMessage(webrtc, action) {
         const arraybuffer = ImageCache.arrayBufferConcat(webrtc.imgCache.arrayBuffer);
         const li = document.createElement('li');
 
-        li.classList.add('text-success');
+        li.classList.add('mb-2', 'text-success');
         li.innerHTML = `[<time class="fw-bold text-12px">${ webrtc.imgCache.date }</time>&nbsp;接收]&nbsp;
 <a class="link-success" href="#" data-id="${ webrtc.targetId }">${ webrtc.targetId }</a>
 ：<img class="upload-image">`;
@@ -88,7 +88,7 @@ async function handleRTCDataChannelMessage(webrtc, action) {
   if (action.type === 'text') {
     const li = document.createElement('li');
 
-    li.classList.add('text-success');
+    li.classList.add('mb-2', 'text-success');
     li.innerHTML = `[<time class="fw-bold text-12px">${ action.payload.date }</time>&nbsp;接收]&nbsp;
 <a class="link-success" href="#" data-id="${ webrtc.targetId }">${ webrtc.targetId }</a>
 ：${ action.payload.text }`;
@@ -201,7 +201,7 @@ function handleSendMessage(event) {
 
     const li = document.createElement('li');
 
-    li.classList.add('text-primary');
+    li.classList.add('mb-2', 'text-primary');
     li.innerHTML = `[<time class="fw-bold text-12px">${ date }</time>&nbsp;发送]&nbsp;
 <a class="link-primary" href="#" data-id="${ RTCTarget.targetId }">${ RTCTarget.targetId }</a>
 ：${ value }`;
@@ -226,7 +226,7 @@ function handleSendImageChange(event) {
       // 本地插入图片
       const li = document.createElement('li');
 
-      li.classList.add('text-primary');
+      li.classList.add('mb-2', 'text-primary');
       li.innerHTML = `[<time class="fw-bold text-12px">${ date }</time>&nbsp;发送]&nbsp;
 <a class="link-primary" href="#" data-id="${ RTCTarget.targetId }">${ RTCTarget.targetId }</a>
 ：<img class="upload-image">`;
