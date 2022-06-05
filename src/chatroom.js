@@ -176,7 +176,7 @@ async function handleAllMessageLinkClick(event) {
       sendMessageBtn.disabled = false;
       uploadFile.disabled = false;
     } else {
-      bsAlert(); // 对方下线提示
+      bsAlert('对方已下线'); // 对方下线提示
     }
   }
 }
