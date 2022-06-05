@@ -67,8 +67,10 @@ async function handleRTCDataChannelMessage(webrtc, action) {
         li.innerHTML = `[<time class="fw-bold text-12px">${ webrtc.imgCache.date }</time>&nbsp;接收]&nbsp;
 <a class="link-success" href="#" data-id="${ webrtc.targetId }">${ webrtc.targetId }</a>
 ：<img class="upload-image">`;
-        li.querySelector('img').src = URL.createObjectURL(
-          new Blob([arraybuffer], { type: webrtc.imgCache.type }));
+
+        const imgSrc = new Blob([arraybuffer], { type: webrtc.imgCache.type });
+
+        li.querySelector('img').src = URL.createObjectURL(imgSrc);
         allMessage.appendChild(li);
         webrtc.imgCache = null;
       }]);
@@ -107,7 +109,6 @@ async function handleWebsocketMessage(event) {
         .filter((o) => o !== id)
         .map((o) => `<button class="me-2 btn btn-info" type="button" data-id="${ o }">${ o }</button>`)
         .join('');
-
       break;
 
     // 收到消息，创建连接
@@ -230,7 +231,10 @@ function handleSendImageChange(event) {
       li.innerHTML = `[<time class="fw-bold text-12px">${ date }</time>&nbsp;发送]&nbsp;
 <a class="link-primary" href="#" data-id="${ RTCTarget.targetId }">${ RTCTarget.targetId }</a>
 ：<img class="upload-image">`;
-      li.querySelector('img').src = URL.createObjectURL(new Blob([arraybuffer], { type }));
+
+      const imgSrc = new Blob([arraybuffer], { type });
+
+      li.querySelector('img').src = URL.createObjectURL(imgSrc);
       allMessage.appendChild(li);
 
       // 发送图片信息
