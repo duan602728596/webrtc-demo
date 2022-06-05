@@ -159,7 +159,7 @@ class WebRTC {
 
   /**
    * 发送ArrayBuffer
-   @param { ArrayBuffer } data
+   * @param { ArrayBuffer } data
    */
   sendBuffer(data) {
     this.dataChannel.send(data);
