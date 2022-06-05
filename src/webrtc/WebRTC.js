@@ -73,7 +73,10 @@ class WebRTC {
 
   // 通道接收消息
   handleDataChannelMessage = (event) => {
-    const action = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+    const action = typeof event.data === 'string' ? JSON.parse(event.data) : {
+      type: 'arraybuffer',
+      payload: event.data
+    };
 
     this.onDataChannelMessage(this, action);
   };

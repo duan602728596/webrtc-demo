@@ -51,8 +51,8 @@ const queue = new Q.Queue({ workerLen: 1 }); // 使用队列保证图片ArrayBuf
 
 async function handleRTCDataChannelMessage(webrtc, action) {
   // 接收二进制消息
-  if (!(action.type && action.payload)) {
-    queue.use([webrtc.imgCache.arrayBuffer.push, webrtc.imgCache.arrayBuffer, action]);
+  if (action.type === 'arraybuffer') {
+    queue.use([webrtc.imgCache.arrayBuffer.push, webrtc.imgCache.arrayBuffer, action.payload]);
     queue.run();
 
     const arrayBufferSize = webrtc.imgCache.arrayBufferSize;
