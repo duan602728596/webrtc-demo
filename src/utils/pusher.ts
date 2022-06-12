@@ -1,7 +1,7 @@
 declare const Pusher: any;
 declare const process: any;
 
-Pusher.logToConsole = process.env.NODE_ENV;
+Pusher.logToConsole = process.env.NODE_ENV === 'development';
 
 export const pusher: typeof Pusher = new Pusher('fc1812ec5b44141b56f5', {
   cluster: 'us2'

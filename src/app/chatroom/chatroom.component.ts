@@ -36,9 +36,7 @@ export class ChatroomComponent implements OnInit {
         const item: WebRTC | undefined = webrtcGroup.find(
           (o: WebRTC): boolean => o.targetId === action.payload.id);
 
-        if (item) {
-          webrtc = item;
-        } else {
+        if (!item) {
           webrtc = new WebRTC({
             id: state.id!,
             targetId: action.payload.id,

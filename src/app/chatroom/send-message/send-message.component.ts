@@ -144,7 +144,6 @@ export class SendMessageComponent implements OnInit {
         webrtc = item;
         this.sendTextMessage(webrtc);
         this.validateForm.setValue({
-          ...this.validateForm.value,
           sendMessage: ''
         });
 
@@ -158,9 +157,9 @@ export class SendMessageComponent implements OnInit {
         token: randomString(30),
         onOpen: (_webrtc: WebRTC): void => {
           this.sendTextMessage(_webrtc);
-          this.validateForm.setValue({
-            ...this.validateForm.value,
-            sendMessage: ''
+          this.validateForm.reset({
+            sendMessage: '',
+            targetId: this.validateForm.value.targetId
           });
           this.loading = false;
         },
@@ -173,7 +172,9 @@ export class SendMessageComponent implements OnInit {
   }
 
   // Upload image
-  handleImageUploadClick(event: Event & { target: HTMLInputElement }): void {
+  handleImageUploadClick(event: Event): void {
+    const target: HTMLInputElement = event.target as HTMLInputElement;
+
     if (!this.validateForm.value.targetId) {
       this.message.error('Please fill in target id first.');
 
@@ -186,7 +187,7 @@ export class SendMessageComponent implements OnInit {
       return;
     }
 
-    if (event.target.files?.length && this.chatroomState?.id && this.validateForm.value.targetId) {
+    if (target.files?.length && this.chatroomState?.id && this.validateForm.value.targetId) {
       const reader: FileReader = new FileReader();
 
       reader.addEventListener('load', async (): Promise<void> => {
@@ -197,7 +198,7 @@ export class SendMessageComponent implements OnInit {
 
         if (item) {
           webrtc = item;
-          this.sendImage(webrtc, event.target.files!, reader.result as ArrayBuffer);
+          this.sendImage(webrtc, target.files!, reader.result as ArrayBuffer);
 
           return;
         }
@@ -208,7 +209,7 @@ export class SendMessageComponent implements OnInit {
           targetId: this.validateForm.value.targetId,
           token: randomString(30),
           onOpen: (_webrtc: WebRTC): void => {
-            this.sendImage(webrtc, event.target.files!, reader.result as ArrayBuffer);
+            this.sendImage(webrtc, target.files!, reader.result as ArrayBuffer);
           },
           onDataChannelMessage: this.onDataChannelMessage,
           onDisconnected: this.onDisconnected
@@ -217,10 +218,11 @@ export class SendMessageComponent implements OnInit {
         webrtcGroup.push(webrtc);
       });
 
-      reader.readAsArrayBuffer(event.target.files[0]);
+      reader.readAsArrayBuffer(target.files[0]);
     }
   }
 
+  // 修改targetId
   handleChangeTargetId: (event: Event) => void = (event: Event): void => {
     this.validateForm.setValue({
       ...this.validateForm.value,
