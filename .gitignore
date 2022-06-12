@@ -19,5 +19,6 @@ yarn-error.log
 package.json.lerna_backup
 
 .angular
-dist/.vercel
-dist/api
+dist
+!dist/package.json
+!dist/vercel.json
