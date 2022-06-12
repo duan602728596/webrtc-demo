@@ -1,0 +1,24 @@
+<div class="main">
+  <h4 class="title">Chat message:</h4>
+  <ul>
+    <li [class]="item.payload.id !== chatroomState?.id ? 'color-primary' : 'color-success'"
+      *ngFor="let item of chatRecord"
+    >
+      [
+      <time class="time">{{ item.payload.date }}</time>
+      <nz-tag *ngIf="item.payload.id !== chatroomState?.id" [nzColor]="'#108ee9'">Send</nz-tag>
+      <nz-tag *ngIf="item.payload.id === chatroomState?.id" [nzColor]="'#87d068'">Accept</nz-tag>
+      ]
+      <span class="target-view">
+        <button nz-button nzType="text" (click)="handleSetTargetIdClick($event, item)">{{ item.payload.id }}</button>
+        :
+      </span>
+      <ng-container *ngIf="item.type === 'message'">
+        {{ item.payload.text }}
+      </ng-container>
+      <ng-container *ngIf="item.type === 'image'">
+        <img class="image" [src]="getSanitizeUrl(item.payload.url)" alt="">
+      </ng-container>
+    </li>
+  </ul>
+</div>

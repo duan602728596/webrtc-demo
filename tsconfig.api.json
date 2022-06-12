@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "alwaysStrict": true,
+    "moduleResolution": "node",
+    "locale": "zh-CN",
+    "target": "ES2020",
+    "newLine": "LF",
+    "resolveJsonModule": true,
+    "strictNullChecks": true,
+    "experimentalDecorators": true,
+    "importHelpers": false,
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "rootDir": "./src-api",
+    "outDir": "./dist/api"
+  },
+  "include": [
+    "./src-api"
+  ],
+  "exclude": [
+    "node_modules",
+    "./src"
+  ]
+}

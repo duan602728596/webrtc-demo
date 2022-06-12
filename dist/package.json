@@ -1,0 +1,11 @@
+{
+  "name": "webrtc-website",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "start:vercel": "vercel dev --listen 5054"
+  },
+  "dependencies": {
+    "pusher": "^5.1.0-beta"
+  }
+}

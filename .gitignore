@@ -1,0 +1,23 @@
+# node
+node_modules
+npm-debug.log
+package-lock.json
+pnpm-lock.yaml
+
+# yarn
+yarn.lock
+yarn-error.log
+.yarnrc
+.yarn/*
+!.yarn/releases
+.pnp.js
+.pnp.cjs
+
+# webstorm
+.idea
+.DS_Store
+package.json.lerna_backup
+
+.angular
+dist/.vercel
+dist/api

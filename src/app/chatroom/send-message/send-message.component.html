@@ -1,0 +1,41 @@
+<div class="form-box">
+  <form nz-form [formGroup]="validateForm">
+    <nz-form-item>
+      <nz-form-label class="send-message-label">Send message</nz-form-label>
+      <nz-form-control class="send-message-control" nzHasFeedback [nzErrorTip]="'Must input send message.'">
+        <textarea nz-input formControlName="sendMessage" required></textarea>
+      </nz-form-control>
+    </nz-form-item>
+
+    <div class="flex">
+      <div class="target-id-box">
+        <nz-form-item>
+          <nz-form-label>Target ID</nz-form-label>
+          <nz-form-control class="target-id-control" nzHasFeedback [nzErrorTip]="'Must input target id.'">
+            <input nz-input type="text" formControlName="targetId" required>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+
+      <div>
+        <button nz-button
+          type="button"
+          nzType="primary"
+          [nzLoading]="loading"
+          (click)="handleSendMessageClick($event)"
+        >
+          Send
+        </button>
+        <span class="id-view">ID: {{ chatroomState?.id }}</span>
+        <button nz-button type="button" (click)="handleCopyIdClick($event)">
+          <i nz-icon nzType="copy" nzTheme="outline"></i>
+          Copy ID
+        </button>
+      </div>
+    </div>
+  </form>
+  <div>
+    <label for="upload-file">Send image：</label>
+    <input class="upload-image" id="upload-file" type="file" accept="image/*" (change)="handleImageUploadClick($event)">
+  </div>
+</div>
