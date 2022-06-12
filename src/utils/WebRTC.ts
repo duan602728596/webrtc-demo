@@ -172,8 +172,10 @@ export class WebRTC {
     });
 
     // pusher
-    channel.bind('rtc-confirm', this.handlePusherRTCConfirm);
-    channel.bind('rtc-candidate', this.handlePusherRTCCandidate);
+    if (channel) {
+      channel.bind('rtc-confirm', this.handlePusherRTCConfirm);
+      channel.bind('rtc-candidate', this.handlePusherRTCCandidate);
+    }
 
     // data channel
     this.dataChannel = this.rtc.createDataChannel(`sendChannel-${ this.id }`);
@@ -310,8 +312,11 @@ export class WebRTC {
 
   // 销毁
   destroy(): void {
-    channel.unbind('rtc-confirm', this.handlePusherRTCConfirm);
-    channel.unbind('rtc-candidate', this.handlePusherRTCCandidate);
+    if (channel) {
+      channel.unbind('rtc-confirm', this.handlePusherRTCConfirm);
+      channel.unbind('rtc-candidate', this.handlePusherRTCCandidate);
+    }
+
     this.rtc.close();
   }
 
