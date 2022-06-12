@@ -7,7 +7,7 @@
       [
       <time class="time">{{ item.payload.date }}</time>
       <nz-tag *ngIf="item.payload.id !== chatroomState?.id" [nzColor]="'#108ee9'">Send</nz-tag>
-      <nz-tag *ngIf="item.payload.id === chatroomState?.id" [nzColor]="'#87d068'">Accept</nz-tag>
+      <nz-tag *ngIf="item.payload.id === chatroomState?.id" [nzColor]="'#87d068'">Receive</nz-tag>
       ]
       <span class="target-view">
         <button nz-button nzType="text" (click)="handleSetTargetIdClick($event, item)">{{ item.payload.id }}</button>
