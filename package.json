@@ -10,7 +10,7 @@
     "start:api": "tsc --project ./tsconfig.api.json --watch",
     "build:api": "tsc --project ./tsconfig.api.json",
     "build:all": "npm run clean && npm run build && npm run build:api",
-    "clean": "rimraf dist/api dist/assets dist/**/*.{html,css,js,map,svg,ico,jpg,png,webp,avif,txt}",
+    "clean": "rimraf dist/api dist/assets dist/**/*.{html,css,js,map,svg,ico,jpg,png,webp,avif,txt} dist/**/*.*.js",
     "eslint": "eslint ./ --fix",
     "eslint:no-fix": "eslint ./",
     "prepare": "husky install"
