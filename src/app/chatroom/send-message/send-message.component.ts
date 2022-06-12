@@ -143,8 +143,9 @@ export class SendMessageComponent implements OnInit {
       if (item) {
         webrtc = item;
         this.sendTextMessage(webrtc);
-        this.validateForm.setValue({
-          sendMessage: ''
+        this.validateForm.reset({
+          sendMessage: '',
+          targetId: this.validateForm.value.targetId
         });
 
         return;
