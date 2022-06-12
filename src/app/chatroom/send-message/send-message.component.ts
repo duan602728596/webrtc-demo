@@ -5,7 +5,14 @@ import { Observable } from 'rxjs';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import copy from 'copy-to-clipboard';
 import dayjs from 'dayjs';
-import { WebRTC, webrtcGroup, type MessageAction, type TextMessageAction } from '../../../utils/WebRTC';
+import {
+  WebRTC,
+  webrtcGroup,
+  type OnDataChannelMessage,
+  type OnDisconnected,
+  type MessageAction,
+  type TextMessageAction
+} from '../../../utils/WebRTC';
 import { randomString } from '../../../utils/randomString';
 import { dataChannelMessageCallback } from '../chatroom.callback';
 import { setChatRecord, InitialState } from '../chatroom.reducer';
@@ -44,6 +51,10 @@ export class SendMessageComponent implements OnInit {
     document.removeEventListener(changeTargetIdEvent.type, this.handleChangeTargetId);
   }
 
+  /**
+   * 发送文字消息
+   * @param { WebRTC } webrtc
+   */
   sendTextMessage(webrtc: WebRTC): void {
     const payload: TextMessageAction = {
       type: 'message',
@@ -60,60 +71,13 @@ export class SendMessageComponent implements OnInit {
     }));
   }
 
-  // Click btn to send message.
-  async handleSendMessageClick(event: Event): Promise<void> {
-    if (!this.validateForm.valid) {
-      this.message.error('Please fill in message and target id first.');
-
-      return;
-    }
-
-    if (this.chatroomState?.id === this.validateForm.value.targetId) {
-      this.message.error('Can\'t send message to yourself.');
-
-      return;
-    }
-
-    if (this.chatroomState?.id) {
-      let webrtc: WebRTC;
-      const item: WebRTC | undefined = webrtcGroup.find(
-        (o: WebRTC): boolean => o.targetId === this.validateForm.value.targetId);
-
-      if (item) {
-        webrtc = item;
-        this.sendTextMessage(webrtc);
-        this.validateForm.setValue({
-          ...this.validateForm.value,
-          sendMessage: ''
-        });
-      } else {
-        this.loading = true;
-        webrtc = new WebRTC({
-          id: this.chatroomState.id,
-          targetId: this.validateForm.value.targetId,
-          token: randomString(30),
-          onOpen: (_webrtc: WebRTC): void => {
-            this.sendTextMessage(_webrtc);
-            this.validateForm.setValue({
-              ...this.validateForm.value,
-              sendMessage: ''
-            });
-            this.loading = false;
-          },
-          onDataChannelMessage: (_rtc: WebRTC, msgAction: MessageAction): void => {
-            dataChannelMessageCallback(this.store, _rtc, msgAction);
-          },
-          onDisconnected: (): void => {
-            this.loading = false;
-          }
-        });
-        await webrtc.init();
-        webrtcGroup.push(webrtc);
-      }
-    }
-  }
-
-  sendImage(webrtc: WebRTC, files: Array<File>, arraybuffer: ArrayBuffer): void {
+  /**
+   * 发送图片
+   * @param { WebRTC } webrtc
+   * @param { FileList } files: 文件
+   * @param { ArrayBuffer } arraybuffer: 图片的arraybuffer
+   */
+  sendImage(webrtc: WebRTC, files: FileList, arraybuffer: ArrayBuffer): void {
     const { name, size, type }: File = files[0];
     const date: string = dayjs().format('YYYY-MM-DD HH:mm:ss');
 
@@ -148,8 +112,68 @@ export class SendMessageComponent implements OnInit {
     }));
   }
 
+  // RTC回调函数
+  onDataChannelMessage: OnDataChannelMessage = (_rtc: WebRTC, msgAction: MessageAction): void => {
+    dataChannelMessageCallback(this.store, _rtc, msgAction);
+  };
+
+  onDisconnected: OnDisconnected = (): void => {
+    this.loading = false;
+  };
+
+  // 点击按钮发送消息
+  async handleSendMessageClick(event: Event): Promise<void> {
+    if (!this.validateForm.valid) {
+      this.message.error('Please fill in message and target id first.');
+
+      return;
+    }
+
+    if (this.chatroomState?.id === this.validateForm.value.targetId) {
+      this.message.error('Can\'t send message to yourself.');
+
+      return;
+    }
+
+    if (this.chatroomState?.id) {
+      let webrtc: WebRTC;
+      const item: WebRTC | undefined = webrtcGroup.find(
+        (o: WebRTC): boolean => o.targetId === this.validateForm.value.targetId);
+
+      if (item) {
+        webrtc = item;
+        this.sendTextMessage(webrtc);
+        this.validateForm.setValue({
+          ...this.validateForm.value,
+          sendMessage: ''
+        });
+
+        return;
+      }
+
+      this.loading = true;
+      webrtc = new WebRTC({
+        id: this.chatroomState.id,
+        targetId: this.validateForm.value.targetId,
+        token: randomString(30),
+        onOpen: (_webrtc: WebRTC): void => {
+          this.sendTextMessage(_webrtc);
+          this.validateForm.setValue({
+            ...this.validateForm.value,
+            sendMessage: ''
+          });
+          this.loading = false;
+        },
+        onDataChannelMessage: this.onDataChannelMessage,
+        onDisconnected: this.onDisconnected
+      });
+      await webrtc.init();
+      webrtcGroup.push(webrtc);
+    }
+  }
+
   // Upload image
-  handleImageUploadClick(event: Event): void {
+  handleImageUploadClick(event: Event & { target: HTMLInputElement }): void {
     if (!this.validateForm.value.targetId) {
       this.message.error('Please fill in target id first.');
 
@@ -162,8 +186,7 @@ export class SendMessageComponent implements OnInit {
       return;
     }
 
-    // @ts-ignore
-    if (event['target'].files?.length && this.chatroomState?.id && this.validateForm.value.targetId) {
+    if (event.target.files?.length && this.chatroomState?.id && this.validateForm.value.targetId) {
       const reader: FileReader = new FileReader();
 
       reader.addEventListener('load', async (): Promise<void> => {
@@ -174,29 +197,27 @@ export class SendMessageComponent implements OnInit {
 
         if (item) {
           webrtc = item;
-          // @ts-ignore
-          this.sendImage(webrtc, event['target'].files, reader.result as ArrayBuffer);
-        } else {
-          this.loading = true;
-          webrtc = new WebRTC({
-            id: this.chatroomState!.id!,
-            targetId: this.validateForm.value.targetId,
-            token: randomString(30),
-            onOpen: (_webrtc: WebRTC): void => {
-              // @ts-ignore
-              this.sendImage(webrtc, event['target'].files, reader.result as ArrayBuffer);
-            },
-            onDataChannelMessage: (_rtc: WebRTC, msgAction: MessageAction): void => {
-              dataChannelMessageCallback(this.store, _rtc, msgAction);
-            }
-          });
-          await webrtc.init();
-          webrtcGroup.push(webrtc);
+          this.sendImage(webrtc, event.target.files!, reader.result as ArrayBuffer);
+
+          return;
         }
+
+        this.loading = true;
+        webrtc = new WebRTC({
+          id: this.chatroomState!.id!,
+          targetId: this.validateForm.value.targetId,
+          token: randomString(30),
+          onOpen: (_webrtc: WebRTC): void => {
+            this.sendImage(webrtc, event.target.files!, reader.result as ArrayBuffer);
+          },
+          onDataChannelMessage: this.onDataChannelMessage,
+          onDisconnected: this.onDisconnected
+        });
+        await webrtc.init();
+        webrtcGroup.push(webrtc);
       });
 
-      // @ts-ignore
-      reader.readAsArrayBuffer(event['target'].files[0]);
+      reader.readAsArrayBuffer(event.target.files[0]);
     }
   }
 
@@ -207,7 +228,7 @@ export class SendMessageComponent implements OnInit {
     });
   };
 
-  // Copy my id
+  // 复制ID
   handleCopyIdClick(event: Event): void {
     if (this.chatroomState?.id) {
       copy(this.chatroomState.id);

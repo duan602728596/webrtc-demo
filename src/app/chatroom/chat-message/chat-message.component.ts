@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { DomSanitizer, type SafeHtml } from '@angular/platform-browser';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { changeTargetIdEvent } from '../send-message/send-message.component';
@@ -32,6 +32,11 @@ export class ChatMessageComponent implements OnInit {
     });
   }
 
+  /**
+   * 返回安全的url地址
+   * @param { string } url
+   * @return { SafeHtml }
+   */
   getSanitizeUrl(url: string): SafeHtml {
     return this.sanitizer.bypassSecurityTrustUrl(url);
   }
