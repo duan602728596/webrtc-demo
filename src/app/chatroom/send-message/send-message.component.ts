@@ -15,9 +15,8 @@ import {
 } from '../../../utils/WebRTC';
 import { randomString } from '../../../utils/randomString';
 import { dataChannelMessageCallback } from '../chatroom.callback';
+import { changeTargetIdEvent } from '../../../utils/event';
 import { setChatRecord, type InitialState } from '../chatroom.reducer';
-
-export const changeTargetIdEvent: Event = new Event('change-target-id-event');
 
 type SelectorState = { chatroom: InitialState };
 type ChatroomID = string | undefined;

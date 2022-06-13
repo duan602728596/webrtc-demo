@@ -1,8 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { DomSanitizer, type SafeHtml } from '@angular/platform-browser';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
-import { changeTargetIdEvent } from '../send-message/send-message.component';
+import { changeTargetIdEvent } from '../../../utils/event';
 import type { InitialState } from '../chatroom.reducer';
 import type { ChatRecord } from '../chatroom.interface';
 
