@@ -43,6 +43,23 @@
  *
  */
 
+(window as any).__Zone_disable_EventEmitter = true;
+(window as any).__Zone_disable_defineProperty = true;
+(window as any).__Zone_disable_EventTargetLegacy = true;
+(window as any).__Zone_disable_timers = true;
+(window as any).__Zone_disable_requestAnimationFrame = true;
+(window as any).__Zone_disable_queueMicrotask = true;
+(window as any).__Zone_disable_blocking = true;
+(window as any).__Zone_disable_EventTarget = true;
+(window as any).__Zone_disable_FileReader = true;
+(window as any).__Zone_disable_MutationObserver = true;
+(window as any).__Zone_disable_IntersectionObserver = true;
+(window as any).__Zone_disable_customElements = true;
+(window as any).__Zone_disable_XHR = true;
+(window as any).__Zone_disable_canvas = true;
+(window as any).__Zone_disable_ZoneAwarePromise = true;
+(window as any).__zone_symbol__DISABLE_WRAPPING_UNCAUGHT_PROMISE_REJECTION = true;
+
 /***************************************************************************************************
  * Zone JS is required by default for Angular itself.
  */
