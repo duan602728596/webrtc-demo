@@ -24,7 +24,7 @@ export class ChatMessageComponent implements OnInit {
   ngOnInit(): void {
     this.store.select('chatroom').subscribe((state: InitialState): void => {
       this.chatroom$State = state;
-      this.chatRecord = [...state.chatRecord];
+      this.chatRecord = state.chatRecord;
       this.changeDetection.detectChanges();
     });
   }

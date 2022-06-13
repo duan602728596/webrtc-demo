@@ -179,7 +179,7 @@ export class SendMessageComponent implements OnInit {
     }
   }
 
-  // Upload image
+  // 上传图片
   handleImageUploadClick(event: Event): void {
     const target: HTMLInputElement = event.target as HTMLInputElement;
 
