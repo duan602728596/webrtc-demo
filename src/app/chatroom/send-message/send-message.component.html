@@ -26,7 +26,7 @@
         >
           Send
         </button>
-        <span class="id-view">ID: {{ chatroomState?.id }}</span>
+        <span class="id-view">ID: {{ chatroom$id | async }}</span>
         <button nz-button type="button" (click)="handleCopyIdClick($event)">
           <i nz-icon nzType="copy" nzTheme="outline"></i>
           Copy ID

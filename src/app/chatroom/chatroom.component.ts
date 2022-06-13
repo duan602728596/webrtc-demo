@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
+import type { Channel } from 'pusher-js';
 import { pusherInstance, pusherDestroy } from '../../utils/pusher';
 import { WebRTC, webrtcGroup, type SetPusherAction, type MessageAction } from '../../utils/WebRTC';
 import { randomString } from '../../utils/randomString';
@@ -12,43 +13,45 @@ import { dataChannelMessageCallback } from './chatroom.callback';
   styleUrls: ['./chatroom.component.sass']
 })
 export class ChatroomComponent implements OnInit {
+  chatroom$State: InitialState | undefined;
+
   constructor(
     private store: Store<{ chatroom: InitialState }>
   ) { /* noop */ }
 
   ngOnInit(): void {
     const id: string = randomString();
-    const channel: any = pusherInstance(id);
+    const channel: Channel = pusherInstance(id);
 
     channel.bind('rtc-ask', this.handlerPusherRTCAskMessage);
+
+    this.store.select('chatroom').subscribe((state: InitialState): unknown => this.chatroom$State = state);
     this.store.dispatch(setId({ id }));
   }
 
   ngOnDestroy(): void {
-    this.store.select('chatroom').subscribe((state: InitialState): unknown => pusherDestroy(state.id!));
+    this.chatroom$State?.id && pusherDestroy(this.chatroom$State.id);
   }
 
   // Pusher event message
-  handlerPusherRTCAskMessage: Function = (action: SetPusherAction): void => {
-    if (action.type === 'rtc-ask') {
-      this.store.select('chatroom').subscribe(async (state: InitialState): Promise<void> => {
-        let webrtc: WebRTC;
-        const item: WebRTC | undefined = webrtcGroup.find(
-          (o: WebRTC): boolean => o.targetId === action.payload.id);
+  handlerPusherRTCAskMessage: Function = async (action: SetPusherAction): Promise<void> => {
+    if (action.type === 'rtc-ask' && this.chatroom$State?.id) {
+      let webrtc: WebRTC;
+      const item: WebRTC | undefined = webrtcGroup.find(
+        (o: WebRTC): boolean => o.targetId === action.payload.id);
 
-        if (!item) {
-          webrtc = new WebRTC({
-            id: state.id!,
-            targetId: action.payload.id,
-            token: action.payload.token,
-            onDataChannelMessage: (_rtc: WebRTC, msgAction: MessageAction): void => {
-              dataChannelMessageCallback(this.store, _rtc, msgAction);
-            }
-          });
-          await webrtc.confirm(action.payload.sdp);
-          webrtcGroup.push(webrtc);
-        }
-      });
+      if (!item) {
+        webrtc = new WebRTC({
+          id: this.chatroom$State?.id,
+          targetId: action.payload.id,
+          token: action.payload.token,
+          onDataChannelMessage: (_rtc: WebRTC, msgAction: MessageAction): void => {
+            dataChannelMessageCallback(this.store, _rtc, msgAction);
+          }
+        });
+        await webrtc.confirm(action.payload.sdp);
+        webrtcGroup.push(webrtc);
+      }
     }
   };
 }

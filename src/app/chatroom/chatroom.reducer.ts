@@ -10,7 +10,6 @@ import type { ChatRecord } from './chatroom.interface';
 
 export interface InitialState {
   id?: string | undefined;
-  pusherModel?: any;
   chatRecord: Array<ChatRecord>; // 聊天记录
 }
 

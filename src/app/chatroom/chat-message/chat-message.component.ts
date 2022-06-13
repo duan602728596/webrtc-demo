@@ -12,21 +12,18 @@ import type { ChatRecord } from '../chatroom.interface';
   styleUrls: ['./chat-message.component.sass']
 })
 export class ChatMessageComponent implements OnInit {
-  chatroom$: Observable<InitialState>;
-  chatroomState: InitialState | undefined;
+  chatroom$State: InitialState | undefined;
   chatRecord: Array<ChatRecord> = [];
 
   constructor(
     private store: Store<{ chatroom: InitialState }>,
     private changeDetection: ChangeDetectorRef,
     private sanitizer: DomSanitizer
-  ) {
-    this.chatroom$ = store.select('chatroom');
-  }
+  ) { /* noop */ }
 
   ngOnInit(): void {
-    this.chatroom$.subscribe((state: InitialState): void => {
-      this.chatroomState = state;
+    this.store.select('chatroom').subscribe((state: InitialState): void => {
+      this.chatroom$State = state;
       this.chatRecord = [...state.chatRecord];
       this.changeDetection.detectChanges();
     });

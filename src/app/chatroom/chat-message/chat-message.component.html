@@ -1,13 +1,13 @@
 <div class="main">
   <h4 class="title">Chat message:</h4>
   <ul>
-    <li [class]="item.payload.id !== chatroomState?.id ? 'color-primary' : 'color-success'"
+    <li [class]="item.payload.id !== chatroom$State?.id ? 'color-primary' : 'color-success'"
       *ngFor="let item of chatRecord"
     >
       [
       <time class="time">{{ item.payload.date }}</time>
-      <nz-tag *ngIf="item.payload.id !== chatroomState?.id" [nzColor]="'#108ee9'">Send</nz-tag>
-      <nz-tag *ngIf="item.payload.id === chatroomState?.id" [nzColor]="'#87d068'">Receive</nz-tag>
+      <nz-tag *ngIf="item.payload.id !== chatroom$State?.id" [nzColor]="'#108ee9'">Send</nz-tag>
+      <nz-tag *ngIf="item.payload.id === chatroom$State?.id" [nzColor]="'#87d068'">Receive</nz-tag>
       ]
       <span class="target-view">
         <button nz-button nzType="text" (click)="handleSetTargetIdClick($event, item)">{{ item.payload.id }}</button>

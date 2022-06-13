@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Store } from '@ngrx/store';
+import { Store, createSelector, type MemoizedSelector } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import copy from 'copy-to-clipboard';
@@ -15,9 +15,16 @@ import {
 } from '../../../utils/WebRTC';
 import { randomString } from '../../../utils/randomString';
 import { dataChannelMessageCallback } from '../chatroom.callback';
-import { setChatRecord, InitialState } from '../chatroom.reducer';
+import { setChatRecord, type InitialState } from '../chatroom.reducer';
 
 export const changeTargetIdEvent: Event = new Event('change-target-id-event');
+
+type SelectorState = { chatroom: InitialState };
+type ChatroomID = string | undefined;
+
+const getChatroomId: MemoizedSelector<SelectorState, ChatroomID> = createSelector<SelectorState, ChatroomID, ChatroomID>(
+  ({ chatroom }: SelectorState): ChatroomID => chatroom.id,
+  (id: ChatroomID): ChatroomID => id);
 
 @Component({
   selector: 'app-send-message',
@@ -25,8 +32,8 @@ export const changeTargetIdEvent: Event = new Event('change-target-id-event');
   styleUrls: ['./send-message.component.sass']
 })
 export class SendMessageComponent implements OnInit {
-  chatroom$: Observable<InitialState>;
-  chatroomState: InitialState | undefined;
+  chatroom$State: InitialState | undefined;
+  chatroom$id: Observable<ChatroomID> | undefined;
   validateForm: FormGroup;
   loading: boolean = false;
 
@@ -35,7 +42,6 @@ export class SendMessageComponent implements OnInit {
     private fb: FormBuilder,
     private message: NzMessageService
   ) {
-    this.chatroom$ = store.select('chatroom');
     this.validateForm = this.fb.group({
       sendMessage: [null, [Validators.required]],
       targetId: [null, [Validators.required]]
@@ -43,7 +49,8 @@ export class SendMessageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.chatroom$.subscribe((state: InitialState): unknown => this.chatroomState = state);
+    this.store.select('chatroom').subscribe((state: InitialState): unknown => this.chatroom$State = state);
+    this.chatroom$id = this.store.select(getChatroomId);
     document.addEventListener(changeTargetIdEvent.type, this.handleChangeTargetId);
   }
 
@@ -129,13 +136,13 @@ export class SendMessageComponent implements OnInit {
       return;
     }
 
-    if (this.chatroomState?.id === this.validateForm.value.targetId) {
+    if (this.chatroom$State?.id === this.validateForm.value.targetId) {
       this.message.error('Can\'t send message to yourself.');
 
       return;
     }
 
-    if (this.chatroomState?.id) {
+    if (this.chatroom$State?.id) {
       let webrtc: WebRTC;
       const item: WebRTC | undefined = webrtcGroup.find(
         (o: WebRTC): boolean => o.targetId === this.validateForm.value.targetId);
@@ -153,7 +160,7 @@ export class SendMessageComponent implements OnInit {
 
       this.loading = true;
       webrtc = new WebRTC({
-        id: this.chatroomState.id,
+        id: this.chatroom$State.id,
         targetId: this.validateForm.value.targetId,
         token: randomString(30),
         onOpen: (_webrtc: WebRTC): void => {
@@ -182,13 +189,13 @@ export class SendMessageComponent implements OnInit {
       return;
     }
 
-    if (this.chatroomState?.id === this.validateForm.value.targetId) {
+    if (this.chatroom$State?.id === this.validateForm.value.targetId) {
       this.message.error('Can\'t send message to yourself.');
 
       return;
     }
 
-    if (target.files?.length && this.chatroomState?.id && this.validateForm.value.targetId) {
+    if (target.files?.length && this.chatroom$State?.id && this.validateForm.value.targetId) {
       const reader: FileReader = new FileReader();
 
       reader.addEventListener('load', async (): Promise<void> => {
@@ -206,7 +213,7 @@ export class SendMessageComponent implements OnInit {
 
         this.loading = true;
         webrtc = new WebRTC({
-          id: this.chatroomState!.id!,
+          id: this.chatroom$State!.id!,
           targetId: this.validateForm.value.targetId,
           token: randomString(30),
           onOpen: (_webrtc: WebRTC): void => {
@@ -233,8 +240,8 @@ export class SendMessageComponent implements OnInit {
 
   // 复制ID
   handleCopyIdClick(event: Event): void {
-    if (this.chatroomState?.id) {
-      copy(this.chatroomState.id);
+    if (this.chatroom$State?.id) {
+      copy(this.chatroom$State.id);
       this.message.info('Copy the id to clipboard.');
     }
   }
