@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --open --hmr --proxy-config=proxy.conf.json",
-    "build": "ng build --delete-output-path=false --aot --build-optimizer",
+    "build": "ng build --delete-output-path=false",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "start:api": "tsc --project ./tsconfig.api.json --watch",
