@@ -1,3 +1,5 @@
+import { random as lodashRandom } from 'lodash-es';
+
 const KEY: string = '1234567890_qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM';
 const KEY_LENGTH: number = KEY.length;
 
@@ -9,4 +11,8 @@ export function randomString(length: number = 10): string {
   }
 
   return result;
+}
+
+export function randomOnlyNum(): string {
+  return `${ lodashRandom(100000, 999999) }`;
 }

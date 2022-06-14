@@ -3,7 +3,7 @@ import { Store } from '@ngrx/store';
 import type { Channel } from 'pusher-js';
 import { pusherInstance, pusherDestroy } from '../../utils/pusher';
 import { WebRTC, webrtcGroup, type SetPusherAction, type MessageAction } from '../../utils/WebRTC';
-import { randomString } from '../../utils/randomString';
+import { randomOnlyNum } from '../../utils/random';
 import { setId, type InitialState } from './chatroom.reducer';
 import { dataChannelMessageCallback } from './chatroom.callback';
 
@@ -20,7 +20,7 @@ export class ChatroomComponent implements OnInit {
   ) { /* noop */ }
 
   ngOnInit(): void {
-    const id: string = randomString();
+    const id: string = randomOnlyNum();
     const channel: Channel = pusherInstance(id);
 
     channel.bind('rtc-ask', this.handlerPusherRTCAskMessage);
