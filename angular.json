@@ -39,7 +39,10 @@
               "./node_modules/ng-zorro-antd/ng-zorro-antd.min.css",
               "src/styles.sass"
             ],
-            "scripts": []
+            "scripts": [],
+            "allowedCommonJsDependencies": [
+              "copy-to-clipboard"
+            ]
           },
           "configurations": {
             "production": {
