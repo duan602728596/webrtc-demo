@@ -5,6 +5,7 @@
     "start": "nodemon server/server.js"
   },
   "dependencies": {
+    "@bbkkbkk/q": "^1.1.1",
     "koa": "^2.13.4",
     "koa-static": "^5.0.0",
     "ws": "^8.7.0"
