@@ -28,7 +28,7 @@ class VideoRTC {
 
     // add track
     if (this.stream) {
-      this.stream.getTracks().forEach(track => this.rtc.addTrack(track, stream));
+      this.stream.getTracks().forEach((track) => this.rtc.addTrack(track, stream));
       this.stream.addEventListener('inactive', this.handleStreamInactive);
     }
 
