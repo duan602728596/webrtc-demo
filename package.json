@@ -8,12 +8,12 @@
     "@bbkkbkk/q": "^1.1.1",
     "koa": "^2.13.4",
     "koa-static": "^5.0.0",
-    "ws": "^8.7.0"
+    "ws": "^8.8.1"
   },
   "devDependencies": {
-    "@types/bootstrap": "^5.1.12",
-    "@types/node": "^17.0.39",
-    "@types/ws": "^8.5.3",
-    "nodemon": "^2.0.16"
+    "@types/bootstrap": "^5",
+    "@types/node": "^18",
+    "@types/ws": "^8",
+    "nodemon": "^2.0.19"
   }
 }
