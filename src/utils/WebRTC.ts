@@ -12,6 +12,7 @@ interface Config {
   id: string;
   targetId: string;
   token: string;
+  iceServer: RTCIceServer;
   onDataChannelMessage?: OnDataChannelMessage;
   onDisconnected?: OnDisconnected;
   onOpen?: Function;
@@ -122,6 +123,7 @@ export class WebRTC {
   id: string;
   targetId: string;
   token: string;
+  iceServer: RTCIceServer;
   rtc: RTCPeerConnection;
   dataChannel: RTCDataChannel;
   onDataChannelMessage?: OnDataChannelMessage;
@@ -135,6 +137,7 @@ export class WebRTC {
       id,
       targetId,
       token,
+      iceServer: iceServerObject,
       onDataChannelMessage,
       onDisconnected,
       onOpen
@@ -143,32 +146,12 @@ export class WebRTC {
     this.id = id;
     this.targetId = targetId;
     this.token = token;
+    this.iceServer = iceServerObject;
     this.onDataChannelMessage = onDataChannelMessage; // 接收消息的回调函数
     this.onDisconnected = onDisconnected; // 信道关闭
     this.onOpen = onOpen;
     this.rtc = new RTCPeerConnection(this.useHost ? undefined : {
-      iceServers: [
-        {
-          urls: 'turn:numb.viagenie.ca',
-          credential: 'muazkh',
-          username: 'webrtc@live.com'
-        },
-        {
-          urls: 'turn:openrelay.metered.ca:80',
-          username: 'openrelayproject',
-          credential: 'openrelayproject'
-        },
-        {
-          urls: 'turn:openrelay.metered.ca:443',
-          username: 'openrelayproject',
-          credential: 'openrelayproject'
-        },
-        {
-          urls: 'turn:openrelay.metered.ca:443?transport=tcp',
-          username: 'openrelayproject',
-          credential: 'openrelayproject'
-        }
-      ]
+      iceServers: [this.iceServer]
     });
 
     // pusher
@@ -222,7 +205,7 @@ export class WebRTC {
   handleRTCIcecandidate: (event: RTCPeerConnectionIceEvent) => Promise<void>
     = async (event: RTCPeerConnectionIceEvent): Promise<void> => {
 
-      if (event.candidate && (this.useHost || event.candidate.type !== 'host')) {
+      if (event.candidate && (this.useHost || event.candidate.type !== 'host') && this.rtc.connectionState !== 'connected') {
         console.log('ICE层发送相关数据', event.candidate);
         await WebRTC.setPusher({
           type: 'rtc-candidate',
@@ -255,6 +238,7 @@ export class WebRTC {
   handlePusherRTCConfirm: Function = async (action: SetPusherAction): Promise<void> => {
     if (action.payload.token !== this.token) return;
 
+    console.log(action);
     await this.answer(action.payload.sdp);
   };
 
@@ -262,6 +246,7 @@ export class WebRTC {
   handlePusherRTCCandidate: Function = async (action: SetPusherAction): Promise<void> => {
     if (action.payload.token !== this.token) return;
 
+    console.log(action);
     await this.rtc.addIceCandidate(action.payload.candidate);
   };
 

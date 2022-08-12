@@ -13,7 +13,8 @@ import {
   type MessageAction,
   type TextMessageAction
 } from '../../../utils/WebRTC';
-import { randomString, randomOnlyNum } from '../../../utils/random';
+import { getIceServer } from '../../../utils/iceServer';
+import { randomString } from '../../../utils/random';
 import { dataChannelMessageCallback } from '../chatroom.callback';
 import { changeTargetIdEvent } from '../../../utils/event';
 import { setChatRecord, type InitialState } from '../chatroom.reducer';
@@ -162,6 +163,7 @@ export class SendMessageComponent implements OnInit {
         id: this.chatroom$State.id,
         targetId: this.validateForm.value.targetId,
         token: randomString(30),
+        iceServer: await getIceServer(),
         onOpen: (_webrtc: WebRTC): void => {
           this.sendTextMessage(_webrtc);
           this.validateForm.reset({
@@ -215,6 +217,7 @@ export class SendMessageComponent implements OnInit {
           id: this.chatroom$State!.id!,
           targetId: this.validateForm.value.targetId,
           token: randomString(30),
+          iceServer: await getIceServer(),
           onOpen: (_webrtc: WebRTC): void => {
             this.sendImage(webrtc, target.files!, reader.result as ArrayBuffer);
           },

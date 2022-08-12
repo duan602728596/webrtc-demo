@@ -3,6 +3,7 @@ import { Store } from '@ngrx/store';
 import type { Channel } from 'pusher-js';
 import { pusherInstance, pusherDestroy } from '../../utils/pusher';
 import { WebRTC, webrtcGroup, type SetPusherAction, type MessageAction } from '../../utils/WebRTC';
+import { getIceServer } from '../../utils/iceServer';
 import { randomOnlyNum } from '../../utils/random';
 import { setId, type InitialState } from './chatroom.reducer';
 import { dataChannelMessageCallback } from './chatroom.callback';
@@ -45,6 +46,7 @@ export class ChatroomComponent implements OnInit {
           id: this.chatroom$State?.id,
           targetId: action.payload.id,
           token: action.payload.token,
+          iceServer: await getIceServer(),
           onDataChannelMessage: (_rtc: WebRTC, msgAction: MessageAction): void => {
             dataChannelMessageCallback(this.store, _rtc, msgAction);
           }

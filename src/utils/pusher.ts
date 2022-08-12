@@ -1,8 +1,6 @@
 import Pusher, { type Channel } from 'pusher-js';
 
-declare const process: any;
-
-Pusher.logToConsole = process.env.NODE_ENV === 'development';
+Pusher.logToConsole = false;
 
 export const pusher: Pusher = new Pusher('fc1812ec5b44141b56f5', {
   cluster: 'us2'
