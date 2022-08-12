@@ -37,6 +37,7 @@ function getIceServer(): Promise<XirsysIceServer> {
     req.on('error', function(err: Error) {
       reject(err);
     });
+
     req.end(JSON.stringify({
       format: 'urls'
     }));
