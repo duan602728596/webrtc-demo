@@ -13,7 +13,7 @@
     "clean": "rimraf dist/api dist/assets dist/**/*.{html,css,js,map,svg,ico,jpg,png,webp,avif,txt} dist/**/*.*.js",
     "eslint": "eslint ./ --fix",
     "eslint:no-fix": "eslint ./",
-    "prepare": "husky install"
+    "postinstall": "husky install"
   },
   "private": true,
   "dependencies": {
