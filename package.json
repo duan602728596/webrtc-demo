@@ -25,7 +25,7 @@
     "@angular/platform-browser": "^14.2.0",
     "@angular/platform-browser-dynamic": "^14.2.0",
     "@angular/router": "^14.2.0",
-    "@ngrx/store": "^13.2.0",
+    "@ngrx/store": "^14.3.0",
     "copy-to-clipboard": "^3.3.1",
     "dayjs": "^1.11.3",
     "lodash-es": "^4.17.21",
