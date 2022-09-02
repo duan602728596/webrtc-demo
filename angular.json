@@ -41,7 +41,9 @@
             ],
             "scripts": [],
             "allowedCommonJsDependencies": [
-              "copy-to-clipboard"
+              "copy-to-clipboard",
+              "dayjs",
+              "pusher-js"
             ]
           },
           "configurations": {
@@ -219,5 +221,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": false
   }
 }
