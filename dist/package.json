@@ -6,6 +6,6 @@
     "start:vercel": "vercel dev --listen 5054"
   },
   "dependencies": {
-    "pusher": "^5.1.0-beta"
+    "pusher": "^5.1.1-beta"
   }
 }
