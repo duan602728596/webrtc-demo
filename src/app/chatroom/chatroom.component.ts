@@ -1,23 +1,31 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import type { Channel } from 'pusher-js';
+import { SendMessageComponent } from './send-message/send-message.component';
+import { ChatMessageComponent } from './chat-message/chat-message.component';
 import { pusherInstance, pusherDestroy } from '../../utils/pusher';
 import { WebRTC, webrtcGroup, type SetPusherAction, type MessageAction } from '../../utils/WebRTC';
 import { getIceServer } from '../../utils/iceServer';
 import { randomOnlyNum } from '../../utils/random';
-import { setId, type InitialState } from './chatroom.reducer';
+import { setId, type ChatroomInitialState } from './chatroom.reducer';
 import { dataChannelMessageCallback } from './chatroom.callback';
+import type { StoreRecord } from '../app.interface';
 
 @Component({
   selector: 'app-chatroom',
   templateUrl: './chatroom.component.html',
-  styleUrls: ['./chatroom.component.sass']
+  styleUrls: ['./chatroom.component.sass'],
+  standalone: true,
+  imports: [
+    SendMessageComponent,
+    ChatMessageComponent
+  ]
 })
 export class ChatroomComponent implements OnInit {
-  chatroom$State: InitialState | undefined;
+  chatroom$State: ChatroomInitialState | undefined;
 
   constructor(
-    private store: Store<{ chatroom: InitialState }>
+    private store: Store<StoreRecord>
   ) { /* noop */ }
 
   ngOnInit(): void {
@@ -26,7 +34,7 @@ export class ChatroomComponent implements OnInit {
 
     channel.bind('rtc-ask', this.handlerPusherRTCAskMessage);
 
-    this.store.select('chatroom').subscribe((state: InitialState): unknown => this.chatroom$State = state);
+    this.store.select('chatroom').subscribe((state: ChatroomInitialState): unknown => this.chatroom$State = state);
     this.store.dispatch(setId({ id }));
   }
 

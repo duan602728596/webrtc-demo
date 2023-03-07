@@ -1,7 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
 import { Store, createSelector, type MemoizedSelector } from '@ngrx/store';
 import { Observable } from 'rxjs';
+import { NzFormModule } from 'ng-zorro-antd/form';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import copy from 'copy-to-clipboard';
 import dayjs from 'dayjs';
@@ -17,9 +21,10 @@ import { getIceServer } from '../../../utils/iceServer';
 import { randomString } from '../../../utils/random';
 import { dataChannelMessageCallback } from '../chatroom.callback';
 import { changeTargetIdEvent } from '../../../utils/event';
-import { setChatRecord, type InitialState } from '../chatroom.reducer';
+import { setChatRecord, type ChatroomInitialState } from '../chatroom.reducer';
+import type { StoreRecord } from '../../app.interface';
 
-type SelectorState = { chatroom: InitialState };
+type SelectorState = { chatroom: ChatroomInitialState };
 type ChatroomID = string | undefined;
 
 const getChatroomId: MemoizedSelector<SelectorState, ChatroomID> = createSelector<SelectorState, ChatroomID, ChatroomID>(
@@ -29,16 +34,24 @@ const getChatroomId: MemoizedSelector<SelectorState, ChatroomID> = createSelecto
 @Component({
   selector: 'app-send-message',
   templateUrl: './send-message.component.html',
-  styleUrls: ['./send-message.component.sass']
+  styleUrls: ['./send-message.component.sass'],
+  standalone: true,
+  imports: [
+    AsyncPipe,
+    ReactiveFormsModule,
+    NzFormModule,
+    NzButtonModule,
+    NzInputModule
+  ]
 })
 export class SendMessageComponent implements OnInit {
-  chatroom$State: InitialState | undefined;
+  chatroom$State: ChatroomInitialState | undefined;
   chatroom$id: Observable<ChatroomID> | undefined;
   validateForm: FormGroup;
   loading: boolean = false;
 
   constructor(
-    private store: Store<{ chatroom: InitialState }>,
+    private store: Store<StoreRecord>,
     private fb: FormBuilder,
     private message: NzMessageService
   ) {
@@ -49,7 +62,7 @@ export class SendMessageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.store.select('chatroom').subscribe((state: InitialState): unknown => this.chatroom$State = state);
+    this.store.select('chatroom').subscribe((state: ChatroomInitialState): unknown => this.chatroom$State = state);
     this.chatroom$id = this.store.select(getChatroomId);
     document.addEventListener(changeTargetIdEvent.type, this.handleChangeTargetId);
   }

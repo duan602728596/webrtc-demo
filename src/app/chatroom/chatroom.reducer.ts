@@ -8,7 +8,7 @@ import {
 } from '@ngrx/store';
 import type { ChatRecord } from './chatroom.interface';
 
-export interface InitialState {
+export interface ChatroomInitialState {
   id?: string | undefined;
   chatRecord: Array<ChatRecord>; // 聊天记录
 }
@@ -25,17 +25,17 @@ export const setId: ActionCreator<string, any> = createAction('[chatroom] Set id
 export const setChatRecord: ActionCreator<string, any>
   = createAction('[chatroom] 添加聊天记录', props<SetChatRecordProps>());
 
-export const chatroomReducer: ActionReducer<InitialState> = createReducer(
+export const chatroomReducer: ActionReducer<ChatroomInitialState> = createReducer(
   { chatRecord: [] },
 
-  on<InitialState, any>(setId, function(state: InitialState, propsData: SetIdProps): InitialState {
+  on<ChatroomInitialState, any>(setId, function(state: ChatroomInitialState, propsData: SetIdProps): ChatroomInitialState {
     return {
       ...state,
       id: propsData.id
     };
   }),
 
-  on<InitialState, any>(setChatRecord, function(state: InitialState, propsData: SetChatRecordProps): InitialState {
+  on<ChatroomInitialState, any>(setChatRecord, function(state: ChatroomInitialState, propsData: SetChatRecordProps): ChatroomInitialState {
     return {
       ...state,
       chatRecord: [...state.chatRecord, propsData.data]

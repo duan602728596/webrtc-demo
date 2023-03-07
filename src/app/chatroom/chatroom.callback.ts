@@ -1,13 +1,10 @@
 import type { Store } from '@ngrx/store';
-import { setChatRecord, type InitialState } from './chatroom.reducer';
+import { setChatRecord, type ChatroomInitialState } from './chatroom.reducer';
 import { ImageCache, type WebRTC, type MessageAction } from '../../utils/WebRTC';
+import type { StoreRecord } from '../app.interface';
 
 /* 接收消息后的回调函数处理 */
-export function dataChannelMessageCallback(
-  store: Store<{ chatroom: InitialState }>,
-  rtc: WebRTC,
-  msgAction: MessageAction
-): void {
+export function dataChannelMessageCallback(store: Store<StoreRecord>, rtc: WebRTC, msgAction: MessageAction): void {
   if (!(typeof msgAction === 'object' && 'type' in msgAction)) return;
 
   if (msgAction.type === 'message') {
