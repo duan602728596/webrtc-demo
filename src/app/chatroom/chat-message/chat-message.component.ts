@@ -1,5 +1,4 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { NgForOf, NgIf } from '@angular/common';
 import { DomSanitizer, type SafeHtml } from '@angular/platform-browser';
 import { Store } from '@ngrx/store';
 import { NzTagModule } from 'ng-zorro-antd/tag';
@@ -15,8 +14,6 @@ import type { ChatRecord } from '../chatroom.interface';
   styleUrls: ['./chat-message.component.sass'],
   standalone: true,
   imports: [
-    NgIf,
-    NgForOf,
     NzTagModule,
     NzButtonModule
   ]

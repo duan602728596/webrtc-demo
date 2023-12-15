@@ -1,5 +1,5 @@
 import type { Store } from '@ngrx/store';
-import { setChatRecord, type ChatroomInitialState } from './chatroom.reducer';
+import { setChatRecord } from './chatroom.reducer';
 import { ImageCache, type WebRTC, type MessageAction } from '../../utils/WebRTC';
 import type { StoreRecord } from '../app.interface';
 

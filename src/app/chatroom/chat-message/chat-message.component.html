@@ -1,24 +1,35 @@
 <div class="main">
   <h4 class="title">Chat message:</h4>
   <ul>
-    <li [class]="item.payload.id !== chatroom$State?.id ? 'color-primary' : 'color-success'"
-      *ngFor="let item of chatRecord"
-    >
-      [
-      <time class="time">{{ item.payload.date }}</time>
-      <nz-tag *ngIf="item.payload.id !== chatroom$State?.id" [nzColor]="'#108ee9'">Send</nz-tag>
-      <nz-tag *ngIf="item.payload.id === chatroom$State?.id" [nzColor]="'#87d068'">Receive</nz-tag>
-      ]
-      <span class="target-view">
-        <button nz-button nzType="text" (click)="handleSetTargetIdClick($event, item)">{{ item.payload.id }}</button>
-        :
-      </span>
-      <ng-container *ngIf="item.type === 'message'">
-        {{ item.payload.text }}
-      </ng-container>
-      <ng-container *ngIf="item.type === 'image'">
-        <img class="image" [src]="getSanitizeUrl(item.payload.url)" alt="">
-      </ng-container>
-    </li>
+    <!-- 渲染消息 -->
+    @for (item of chatRecord; track $index) {
+      <li [class]="item.payload.id !== chatroom$State?.id ? 'color-primary' : 'color-success'">
+        [
+        <time class="time">{{ item.payload.date }}</time>
+
+        <!-- 发送方 or 接收方 -->
+        @if (item.payload.id !== chatroom$State?.id) {
+          <nz-tag [nzColor]="'#108ee9'">Send</nz-tag>
+        } @else if (item.payload.id === chatroom$State?.id) {
+          <nz-tag [nzColor]="'#87d068'">Receive</nz-tag>
+        }
+
+        ]
+        <span class="target-view">
+          <button nz-button nzType="text" (click)="handleSetTargetIdClick($event, item)">{{ item.payload.id }}</button>
+          :
+        </span>
+
+        <!-- 消息 -->
+        @if (item.type === 'message') {
+          <ng-container>{{ item.payload.text }}</ng-container>
+        } @else if (item.type === 'image') {
+          <ng-container>
+            <img class="image" [src]="getSanitizeUrl(item.payload.url)" alt="消息图片">
+          </ng-container>
+        }
+
+      </li>
+    }
   </ul>
 </div>
