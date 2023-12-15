@@ -4,7 +4,6 @@
   "compilerOptions": {
     "alwaysStrict": true,
     "moduleResolution": "node",
-    "locale": "zh-CN",
     "newLine": "LF",
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,

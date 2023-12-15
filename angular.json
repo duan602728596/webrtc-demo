@@ -83,10 +83,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "webrtc-website:build:production"
+              "buildTarget": "webrtc-website:build:production"
             },
             "development": {
-              "browserTarget": "webrtc-website:build:development"
+              "buildTarget": "webrtc-website:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -94,7 +94,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "webrtc-website:build"
+            "buildTarget": "webrtc-website:build"
           }
         },
         "test": {
@@ -187,10 +187,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "chatroom:build:production"
+              "buildTarget": "chatroom:build:production"
             },
             "development": {
-              "browserTarget": "chatroom:build:development"
+              "buildTarget": "chatroom:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -198,7 +198,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "chatroom:build"
+            "buildTarget": "chatroom:build"
           }
         },
         "test": {
