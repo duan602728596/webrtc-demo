@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { registerLocaleData } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import zh from '@angular/common/locales/zh';
 import { StoreModule } from '@ngrx/store';
@@ -18,12 +18,13 @@ registerLocaleData(zh);
   declarations: [
     AppComponent
   ],
+  bootstrap: [
+    AppComponent
+  ],
   imports: [
     BrowserModule,
-    HttpClientModule,
     BrowserAnimationsModule,
     AppRoutingModule,
-
     // reducer
     StoreModule.forRoot({
       chatroom: chatroomReducer
@@ -34,10 +35,8 @@ registerLocaleData(zh);
       provide: NZ_I18N,
       useValue: zh_CN
     },
-    NzMessageService
-  ],
-  bootstrap: [
-    AppComponent
+    NzMessageService,
+    provideHttpClient(withInterceptorsFromDi())
   ]
 })
 export class AppModule { }
