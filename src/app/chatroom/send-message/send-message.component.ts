@@ -94,8 +94,8 @@ export class SendMessageComponent implements OnInit {
   /**
    * 发送图片
    * @param { WebRTC } webrtc
-   * @param { FileList } files: 文件
-   * @param { ArrayBuffer } arraybuffer: 图片的arraybuffer
+   * @param { FileList } files - 文件
+   * @param { ArrayBuffer } arraybuffer - 图片的arraybuffer
    */
   sendImage(webrtc: WebRTC, files: FileList, arraybuffer: ArrayBuffer): void {
     const { name, size, type }: File = files[0];

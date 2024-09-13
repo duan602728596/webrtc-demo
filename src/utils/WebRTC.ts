@@ -258,7 +258,7 @@ export class WebRTC {
 
   /**
    * 接收端
-   * @param { RTCSessionDescriptionInit } sdp: 请求端的offer
+   * @param { RTCSessionDescriptionInit } sdp - 请求端的offer
    */
   async accept(sdp: RTCSessionDescriptionInit): Promise<void> {
     await this.rtc.setRemoteDescription(sdp);
@@ -267,7 +267,7 @@ export class WebRTC {
 
   /**
    * 请求端
-   * @param { RTCSessionDescriptionInit } sdp: 接收端的answer
+   * @param { RTCSessionDescriptionInit } sdp - 接收端的answer
    */
   async answer(sdp: RTCSessionDescriptionInit): Promise<void> {
     await this.rtc.setRemoteDescription(sdp);
