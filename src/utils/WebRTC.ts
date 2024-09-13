@@ -219,7 +219,7 @@ export class WebRTC {
   // RTC datachannel
   handleRTCDataChannel: (event: RTCDataChannelEventInit) => void = (event: RTCDataChannelEventInit): void => {
     if (event.channel.label === `sendChannel-${ this.targetId }`) {
-      event.channel.addEventListener('open', () => console.log('允许接收消息'));
+      event.channel.addEventListener('open', (): void => console.log('允许接收消息'));
       event.channel.addEventListener('message', this.handleDataChannelMessage);
     }
   };

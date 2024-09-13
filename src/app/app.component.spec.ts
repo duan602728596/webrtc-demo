@@ -28,7 +28,7 @@ describe('AppComponent', (): void => {
     expect(app.title).toEqual('webrtc-website');
   });
 
-  it('should render title', () => {
+  it('should render title', (): void => {
     const fixture: ComponentFixture<AppComponent> = TestBed.createComponent(AppComponent);
 
     fixture.detectChanges();
