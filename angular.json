@@ -24,9 +24,6 @@
               "base": "dist"
             },
             "index": "src/index.html",
-            "polyfills": [
-              "src/polyfills.ts"
-            ],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "sass",
             "assets": [
@@ -103,7 +100,7 @@
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
             "main": "src/test.ts",
-            "polyfills": "src/polyfills.ts",
+            "polyfills": ["zone.js", "zone.js/testing"],
             "tsConfig": "tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",
             "inlineStyleLanguage": "sass",
@@ -141,9 +138,6 @@
               "base": "dist/chatroom"
             },
             "index": "projects/chatroom/src/index.html",
-            "polyfills": [
-              "projects/chatroom/src/polyfills.ts"
-            ],
             "tsConfig": "projects/chatroom/tsconfig.app.json",
             "inlineStyleLanguage": "sass",
             "assets": [
@@ -209,7 +203,7 @@
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
             "main": "projects/chatroom/src/test.ts",
-            "polyfills": "projects/chatroom/src/polyfills.ts",
+            "polyfills": ["zone.js", "zone.js/testing"],
             "tsConfig": "projects/chatroom/tsconfig.spec.json",
             "karmaConfig": "projects/chatroom/karma.conf.js",
             "inlineStyleLanguage": "sass",

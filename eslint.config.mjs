@@ -15,7 +15,8 @@ const ignores = [
   '.pnp.cjs',
   '.angular/**',
   'lib',
-  'dist'
+  'dist',
+  'out-tsc/spec/**'
 ];
 
 function globalsSettings(keys) {
