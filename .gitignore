@@ -18,6 +18,7 @@ yarn-error.log
 .DS_Store
 package.json.lerna_backup
 
+.eslintcache
 .angular
 dist
 !dist/package.json
