@@ -43,6 +43,7 @@
  *
  */
 
+/*
 (window as any).__Zone_disable_EventEmitter = true;
 (window as any).__Zone_disable_defineProperty = true;
 (window as any).__Zone_disable_EventTargetLegacy = true;
@@ -59,11 +60,12 @@
 (window as any).__Zone_disable_canvas = true;
 (window as any).__Zone_disable_ZoneAwarePromise = true;
 (window as any).__zone_symbol__DISABLE_WRAPPING_UNCAUGHT_PROMISE_REJECTION = true;
+*/
 
 /***************************************************************************************************
  * Zone JS is required by default for Angular itself.
  */
-import 'zone.js'; // Included with Angular CLI.
+// import 'zone.js'; // Included with Angular CLI.
 
 
 /***************************************************************************************************

@@ -1,4 +1,3 @@
-/* To learn more about this file see: https://angular.io/config/tsconfig. */
 {
   "compileOnSave": false,
   "compilerOptions": {
@@ -10,12 +9,13 @@
     "strictNullChecks": true,
     "experimentalDecorators": true,
     "importHelpers": true,
-    "target": "ES2017",
+    "target": "ES2022",
     "module": "ES2022",
     "baseUrl": "./",
     "outDir": "./dist/out-tsc",
     "lib": [
       "es2020",
+      "es2021",
       "dom"
     ]
   },

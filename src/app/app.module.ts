@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, provideExperimentalZonelessChangeDetection } from '@angular/core';
 import { registerLocaleData } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
@@ -31,6 +31,7 @@ registerLocaleData(zh);
     })
   ],
   providers: [
+    provideExperimentalZonelessChangeDetection(),
     {
       provide: NZ_I18N,
       useValue: zh_CN
