@@ -22,8 +22,7 @@ export interface SetChatRecordProps {
 }
 
 export const setId: ActionCreator<string, any> = createAction('[chatroom] Set id', props<SetIdProps>());
-export const setChatRecord: ActionCreator<string, any>
-  = createAction('[chatroom] 添加聊天记录', props<SetChatRecordProps>());
+export const setChatRecord: ActionCreator<string, any> = createAction('[chatroom] 添加聊天记录', props<SetChatRecordProps>());
 
 export const chatroomReducer: ActionReducer<ChatroomInitialState> = createReducer(
   { chatRecord: [] },
