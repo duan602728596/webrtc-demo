@@ -23,3 +23,4 @@ package.json.lerna_backup
 dist
 !dist/package.json
 !dist/vercel.json
+!dist/.vercelignore
