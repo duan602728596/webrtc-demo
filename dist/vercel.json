@@ -3,10 +3,7 @@
     {
       "source": "/api/(.*)",
       "destination": "/api"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/browser"
     }
-  ]
+  ],
+  "outputDirectory": "browser"
 }
