@@ -1,11 +1,14 @@
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
+import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
+import { routes } from './app.routes';
 
 describe('AppComponent', (): void => {
   beforeEach(async (): Promise<void> => {
     await TestBed.configureTestingModule({
-      imports: [RouterTestingModule]
+      imports: [
+        RouterModule.forRoot(routes)
+      ]
     }).compileComponents();
   });
 
