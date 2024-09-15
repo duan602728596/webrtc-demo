@@ -32,12 +32,12 @@ registerLocaleData(zh);
   ],
   providers: [
     provideExperimentalZonelessChangeDetection(),
+    provideHttpClient(withInterceptorsFromDi()),
     {
       provide: NZ_I18N,
       useValue: zh_CN
     },
-    NzMessageService,
-    provideHttpClient(withInterceptorsFromDi())
+    NzMessageService
   ]
 })
 export class AppModule { }
