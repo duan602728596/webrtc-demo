@@ -34,7 +34,7 @@ function getIceServer(): Promise<XirsysIceServer> {
       });
     });
 
-    req.on('error', function(err: Error) {
+    req.on('error', function(err: Error): void {
       reject(err);
     });
 
