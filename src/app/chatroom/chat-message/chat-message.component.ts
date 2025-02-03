@@ -12,7 +12,6 @@ import type { ChatRecord } from '../chatroom.interface';
   selector: 'app-chat-message',
   templateUrl: './chat-message.component.html',
   styleUrls: ['./chat-message.component.sass'],
-  standalone: true,
   imports: [
     NzTagModule,
     NzButtonModule

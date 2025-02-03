@@ -15,7 +15,6 @@ import type { StoreRecord } from '../app.interface';
   selector: 'app-chatroom',
   templateUrl: './chatroom.component.html',
   styleUrls: ['./chatroom.component.sass'],
-  standalone: true,
   imports: [
     SendMessageComponent,
     ChatMessageComponent

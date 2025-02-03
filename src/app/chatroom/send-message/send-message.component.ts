@@ -35,7 +35,6 @@ const getChatroomId: MemoizedSelector<SelectorState, ChatroomID> = createSelecto
   selector: 'app-send-message',
   templateUrl: './send-message.component.html',
   styleUrls: ['./send-message.component.sass'],
-  standalone: true,
   imports: [
     AsyncPipe,
     ReactiveFormsModule,

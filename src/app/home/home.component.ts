@@ -6,7 +6,6 @@ import { NzTypographyModule } from 'ng-zorro-antd/typography';
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrl: './home.component.sass',
-  standalone: true,
   imports: [
     RouterLink,
     NzTypographyModule
