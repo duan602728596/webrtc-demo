@@ -11,7 +11,6 @@ import { chatroomReducer } from './chatroom/chatroom.reducer';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideExperimentalZonelessChangeDetection(),
-    provideExperimentalZonelessChangeDetection(),
     provideHttpClient(withInterceptorsFromDi()),
     provideAnimations(),
     provideRouter(routes),
