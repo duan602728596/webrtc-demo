@@ -1,4 +1,4 @@
-import { provideZonelessChangeDetection, type ApplicationConfig } from '@angular/core';
+import { provideZonelessChangeDetection, provideBrowserGlobalErrorListeners, type ApplicationConfig } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
@@ -11,6 +11,7 @@ import { chatroomReducer } from './chatroom/chatroom.reducer';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZonelessChangeDetection(),
+    provideBrowserGlobalErrorListeners(),
     provideHttpClient(withInterceptorsFromDi()),
     provideAnimations(),
     provideRouter(routes),
